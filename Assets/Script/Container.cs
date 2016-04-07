@@ -67,6 +67,7 @@ public class Container {
 
     /// <summary>
     /// Returns an object of type T with all its constructor dependencies resolved. 
+    /// Mainly used for testing. Avoid using in game code. 
     /// </summary>
     /// <typeparam name="T">Type to resolve.</typeparam>
     public object Resolve<T>() {
