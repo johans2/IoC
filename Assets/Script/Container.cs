@@ -48,40 +48,13 @@ public class Container {
             .Where(prop => prop.IsDefined(typeof(Dependency), false)).ToArray();
         
         foreach(PropertyInfo property in properties) {
-            object instance = GetInstance(property.PropertyType);
+            object instance = Resolve(property.PropertyType);
             property.SetValue(obj, instance, null);
         }
     }
-
+    
     /// <summary>
-    /// Returns a resolved instance of T type. Either find a previously resolved instance or resolve a new one. 
-    /// </summary>
-    /// <typeparam name="T">Instance of type of T will be returned.</typeparam>
-    public object GetInstance<T>() {
-        Type type = typeof(T);
-        return GetInstance(type);
-    }
-
-    /// <summary>
-    /// Returns an instance of the given type. Either find a previously resolved instance or resolve a new one.
-    /// </summary>
-    /// <param name="type">Instance of type will be returned.</param>
-    private object GetInstance(Type type) {
-        if(dependencyChain.Contains(type)) {
-            throw new CircularDependencyException("Circular dependency in " + type.ToString());
-        }
-        dependencyChain.Add(type);
-
-        object instance;
-        if(!Instances.TryGetValue(type, out instance)) {
-            instance = Resolve(type);
-            Instances.Add(type, instance);
-        }
-        return instance;
-    }
-
-    /// <summary>
-    /// Check that type are valid for injection. 
+    /// Check that type are valid for injection.
     /// </summary>
     private void ValidateRegistration<TInterface, TClass>() {
         if(!typeof(TInterface).IsInterface) {
@@ -93,23 +66,46 @@ public class Container {
     }
 
     /// <summary>
-    /// Get an object of type with all its constructor dependencies resolved. 
+    /// Returns an object of type T with all its constructor dependencies resolved. 
+    /// </summary>
+    /// <typeparam name="T">Type to resolve.</typeparam>
+    public object Resolve<T>() {
+        Type type = typeof(T);
+        return Resolve(type);
+    }
+
+    /// <summary>
+    /// Returns an object of type with all its constructor dependencies resolved. 
     /// </summary>
     /// <param name="type">Type to resolve.</param>
     private object Resolve(Type type) {
+        object instance;
+
+        if(Instances.TryGetValue(type, out instance)) {
+            return instance;
+        }
+
+        if(dependencyChain.Contains(type)) {
+            throw new CircularDependencyException("Circular dependency in " + type.ToString());
+        }
+        dependencyChain.Add(type);
+
         Type implementation;
         if(!Registrations.TryGetValue(type, out implementation)) {
-            throw new Exception("Attempt to instanciate a null-binding. " + type.ToString() + " is not registered.");
+            throw new NullBindingException("Attempt to instanciate a null-binding. " + type.ToString() + " is not registered.");
         }
 
         ConstructorInfo constructor = GetConstructor(implementation);
-        object[] constructorParameters = GetConstructorParameters(constructor);
+        object[] dependencies = GetResolvedDependencies(constructor);
 
-        if(constructorParameters.Length < 1) {
+        if(dependencies.Length < 1) {
             dependencyChain.Clear();
         }
         
-        return constructor.Invoke(constructorParameters);
+        instance = constructor.Invoke(dependencies);
+        Instances.Add(type,instance);
+
+        return instance;
     }
 
     /// <summary>
@@ -132,7 +128,7 @@ public class Container {
     /// </summary>
     /// <param name="constructorInfo">The constructor to get and resolve parameters for.</param>
     /// <returns></returns>
-    private object[] GetConstructorParameters(ConstructorInfo constructorInfo) {
+    private object[] GetResolvedDependencies(ConstructorInfo constructorInfo) {
         List<object> parameters = new List<object>();
 
         ParameterInfo[] parameterInfo = constructorInfo.GetParameters();
@@ -143,7 +139,7 @@ public class Container {
             }
             
             Type parameterType = parameter.ParameterType;
-            object instance = GetInstance(parameterType);
+            object instance = Resolve(parameterType);
             parameters.Add(instance);
         }
 

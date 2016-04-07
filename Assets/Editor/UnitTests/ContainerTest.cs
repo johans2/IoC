@@ -7,21 +7,28 @@ using System;
 [TestFixture]
 internal class ContainerTest {
 
+    private Container container;
 
-    [TestFixtureSetUp]
+    /// <summary>
+    /// Run before every test.
+    /// </summary>
+    [SetUp]
     public void Setup() {
-
+        container = new Container();
+        MockClass1.constructorCalls = 0;
+        MockClass2.constructorCalls = 0;
+        MockClass3.constructorCalls = 0;
+        MockClass4.constructorCalls = 0;
+        MockClass5.constructorCalls = 0;
+        MockClass6.constructorCalls = 0;
     }
 
-    internal interface IMockClass1 {
-    }
-    internal interface IMockClass2 {
-    }
-    internal interface IMockClass3 {
-    }
+    internal interface IMockClass1 {}
+    internal interface IMockClass2 {}
+    internal interface IMockClass3 {}
 
     internal class MockClass1 : IMockClass1 {
-        public int constructorCalls = 0;
+        public static int constructorCalls = 0;
         public IMockClass2 mock2;
         public IMockClass3 mock3;
 
@@ -33,7 +40,7 @@ internal class ContainerTest {
     }
 
     internal class MockClass2 : IMockClass2 {
-        public int constructorCalls = 0;
+        public static int constructorCalls = 0;
         public IMockClass3 mock3;
 
         public MockClass2(IMockClass3 mock3) {
@@ -43,7 +50,7 @@ internal class ContainerTest {
     }
 
     internal class MockClass3 : IMockClass3 {
-        public int constructorCalls = 0;
+        public static int constructorCalls = 0;
         public MockClass3() {
             constructorCalls++;
         }
@@ -51,7 +58,6 @@ internal class ContainerTest {
     
     [Test]
     public void Register() {
-        Container container = new Container();
         container.Register<MockClass1>();
         container.Register<MockClass2>();
 
@@ -63,7 +69,6 @@ internal class ContainerTest {
 
     [Test]
     public void RegisterWithInterface() {
-        Container container = new Container();
         container.Register<IMockClass1, MockClass1>();
         container.Register<IMockClass2, MockClass2>();
 
@@ -74,47 +79,113 @@ internal class ContainerTest {
     }
 
     [Test]
-    public void GetInstance() {
-        Container container = new Container();
+    public void ResolveWithInterface() {
         container.Register<IMockClass1, MockClass1>();
         container.Register<IMockClass2, MockClass2>();
         container.Register<IMockClass3, MockClass3>();
 
-        MockClass1 mock1 = container.GetInstance<IMockClass1>() as MockClass1;
-        MockClass2 mock2 = container.GetInstance<IMockClass2>() as MockClass2;
-        MockClass3 mock3 = container.GetInstance<IMockClass3>() as MockClass3;
+        MockClass1 mock1 = container.Resolve<IMockClass1>() as MockClass1;
+        MockClass2 mock2 = container.Resolve<IMockClass2>() as MockClass2;
+        MockClass3 mock3 = container.Resolve<IMockClass3>() as MockClass3;
 
-        Assert.AreEqual(1, mock1.constructorCalls);
-        Assert.AreEqual(1, mock2.constructorCalls);
-        Assert.AreEqual(1, mock3.constructorCalls);
+        // Check that contructors have only been called once.
+        Assert.AreEqual(1, MockClass1.constructorCalls);
+        Assert.AreEqual(1, MockClass2.constructorCalls);
+        Assert.AreEqual(1, MockClass3.constructorCalls);
 
-
-
+        // Check that references in obejcts has been set with the correct references.
+        Assert.IsNotNull(mock1.mock2);
+        Assert.IsNotNull(mock1.mock3);
+        Assert.IsNotNull(mock2.mock3);
+        Assert.AreSame(mock1.mock2, mock2);
+        Assert.AreSame(mock1.mock3, mock3);
+        Assert.AreSame(mock1.mock3, mock2.mock3);
     }
 
     internal class MockClass4 {
-        public MockClass4(MockClass5 mock5) { }
+        public static int constructorCalls = 0;
+        public MockClass5 mock5;
+        public MockClass6 mock6;
+
+        public MockClass4(MockClass5 mock5, MockClass6 mock6) {
+            this.mock5 = mock5;
+            this.mock6 = mock6;
+            constructorCalls++;
+        }
     }
 
     internal class MockClass5 {
-        public MockClass5(MockClass6 mock6) { }
+        public static int constructorCalls = 0;
+        public MockClass6 mock6;
+
+        public MockClass5(MockClass6 mock6) {
+            this.mock6 = mock6;
+            constructorCalls++;
+        }
     }
 
     internal class MockClass6 {
-        public MockClass6(MockClass4 mock4) { }
+        public static int constructorCalls = 0;
 
+        public MockClass6() {
+            constructorCalls++;
+        }
+    }
+    
+    [Test]
+    public void ResolveWithOutInterface() {
+        container.Register<MockClass4>();
+        container.Register<MockClass5>();
+        container.Register<MockClass6>();
 
+        MockClass4 mock4 = container.Resolve<MockClass4>() as MockClass4;
+        MockClass5 mock5 = container.Resolve<MockClass5>() as MockClass5;
+        MockClass6 mock6 = container.Resolve<MockClass6>() as MockClass6;
+
+        // Check that contructors have only been called once.
+        Assert.AreEqual(1, MockClass4.constructorCalls);
+        Assert.AreEqual(1, MockClass5.constructorCalls);
+        Assert.AreEqual(1, MockClass6.constructorCalls);
+
+        // Check that references in obejcts has been set with the correct references.
+        Assert.IsNotNull(mock4.mock5);
+        Assert.IsNotNull(mock4.mock6);
+        Assert.IsNotNull(mock5.mock6);
+        Assert.AreSame(mock4.mock5, mock5);
+        Assert.AreSame(mock4.mock6, mock6);
+        Assert.AreSame(mock4.mock6, mock5.mock6);
+    }
+
+    internal class MockClass7 {
+        public MockClass7(MockClass8 mock8) { }
+    }
+
+    internal class MockClass8 {
+        public MockClass8(MockClass9 mock9) { }
+    }
+
+    internal class MockClass9 {
+        public MockClass9(MockClass8 mock8) { }
     }
 
     [Test]
     [ExpectedException(typeof(CircularDependencyException))]
     public void CircularDependency() {
-        Container container = new Container();
-        container.Register<MockClass4>();
-        container.Register<MockClass5>();
-        container.Register<MockClass6>();
+        container.Register<MockClass7>();
+        container.Register<MockClass8>();
+        container.Register<MockClass9>();
 
-        MockClass4 o = container.GetInstance<MockClass4>() as MockClass4;
+        MockClass7 o = container.Resolve<MockClass7>() as MockClass7;
     }
 
+    [Test]
+    [ExpectedException(typeof(NullBindingException))]
+    public void NullBinding() {
+        // Don't register nessessary dependency IMockClass3
+        container.Register<IMockClass1, MockClass1>();
+        container.Register<IMockClass2, MockClass2>();
+
+        IMockClass1 o = container.Resolve<IMockClass1>() as IMockClass1;
+
+    }
 }
