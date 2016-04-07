@@ -18,7 +18,6 @@ public class TestBehaviour : MonoBehaviour {
     void Start() {
         //    this.Inject();
         startCalls++;
-        int a = 1;
     }
 
     void Update() {

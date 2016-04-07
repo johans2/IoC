@@ -186,6 +186,5 @@ internal class ContainerTest {
         container.Register<IMockClass2, MockClass2>();
 
         IMockClass1 o = container.Resolve<IMockClass1>() as IMockClass1;
-
     }
 }
