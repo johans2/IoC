@@ -171,11 +171,12 @@ internal class ContainerTest {
     [Test]
     [ExpectedException(typeof(CircularDependencyException))]
     public void CircularDependency() {
+        // MockClass7 has a circular dependency.
         container.Register<MockClass7>();
         container.Register<MockClass8>();
         container.Register<MockClass9>();
 
-        MockClass7 o = container.Resolve<MockClass7>() as MockClass7;
+        container.Resolve<MockClass7>();
     }
 
     [Test]
@@ -185,6 +186,6 @@ internal class ContainerTest {
         container.Register<IMockClass1, MockClass1>();
         container.Register<IMockClass2, MockClass2>();
 
-        IMockClass1 o = container.Resolve<IMockClass1>() as IMockClass1;
+        container.Resolve<IMockClass1>();
     }
 }
