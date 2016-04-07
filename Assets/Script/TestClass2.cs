@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TestClass2 {
+public class TestClass2 : ITestClass2 {
 
     // Use this for initialization
     public string myString2 = "Not constructed.";

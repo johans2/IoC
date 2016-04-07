@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Assertions;
 
 public class TestBehaviour : MonoBehaviour {
 
     [Dependency]
-    private TestClass testClass { get; set; }
+    private ITestClass testClass { get; set; }
 
     [Dependency]
-    private TestClass2 testClass2 { get; set; }
+    private ITestClass2 testClass2 { get; set; }
 
     public static int startCalls = 0;
 
@@ -16,8 +17,9 @@ public class TestBehaviour : MonoBehaviour {
     }
 
     void Start() {
-        //    this.Inject();
         startCalls++;
+        Assert.IsNotNull(testClass);
+        Assert.IsNotNull(testClass2);
     }
 
     void Update() {
