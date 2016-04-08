@@ -31,7 +31,7 @@ public class Container {
     /// <typeparam name="TClass">Type to register.</typeparam>
     public void Register<TClass>() where TClass : class {
         if(Registrations.Values.Contains(typeof(TClass))) {
-            throw new Exception(typeof(TClass).ToString() + "is already registered and bound to an interface.");
+            throw new RegistrationException(typeof(TClass).ToString() + "is already registered.");
         }
 
         Registrations.Add(typeof(TClass), typeof(TClass));
@@ -58,10 +58,10 @@ public class Container {
     /// </summary>
     private void ValidateRegistration<TInterface, TClass>() {
         if(!typeof(TInterface).IsInterface) {
-            throw new Exception(typeof(TInterface).ToString() + "is not an interface.");
+            throw new RegistrationException(typeof(TInterface).ToString() + "is not an interface.");
         }
         if(typeof(TClass).IsAbstract) {
-            throw new Exception(typeof(TClass).ToString() + "is abstract and cannot be instantiated.");
+            throw new RegistrationException(typeof(TClass).ToString() + "is abstract and cannot be instantiated.");
         }
     }
 
@@ -97,7 +97,7 @@ public class Container {
         }
 
         ConstructorInfo constructor = GetConstructor(implementation);
-        object[] dependencies = GetResolvedDependencies(constructor);
+        object[] dependencies = ResolvedDependencies(constructor);
 
         if(dependencies.Length < 1) {
             dependencyChain.Clear();
@@ -117,7 +117,7 @@ public class Container {
     private ConstructorInfo GetConstructor(Type type) {
         ConstructorInfo[] constructors = type.GetConstructors();
         if(constructors.Length < 1) {
-            throw new MissingMemberException(type.ToString() + " has no public constructors and cannot be instanciated.");
+            throw new ResolveException(type.ToString() + " has no public constructors and cannot be instanciated.");
         }
         // Get constructor with the most parameters
         ConstructorInfo correctConstructor = constructors.Aggregate((c1, c2) => c1.GetParameters().Count() > c2.GetParameters().Count() ? c1 : c2);
@@ -129,14 +129,14 @@ public class Container {
     /// </summary>
     /// <param name="constructorInfo">The constructor to get and resolve parameters for.</param>
     /// <returns></returns>
-    private object[] GetResolvedDependencies(ConstructorInfo constructorInfo) {
+    private object[] ResolvedDependencies(ConstructorInfo constructorInfo) {
         List<object> parameters = new List<object>();
 
         ParameterInfo[] parameterInfo = constructorInfo.GetParameters();
 
         foreach(ParameterInfo parameter in parameterInfo) {
             if(parameter.ParameterType.IsValueType) {
-                throw new Exception("Parameter " + parameter.ToString() + " in " + constructorInfo.ReflectedType  + " is a valuetype. This is not allowed in injected classes");
+                throw new ResolveException("Parameter " + parameter.ToString() + " in " + constructorInfo.ReflectedType  + " is a valuetype. This is not allowed in injected classes");
             }
             
             Type parameterType = parameter.ParameterType;

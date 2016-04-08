@@ -7,7 +7,7 @@ public abstract class BaseBootStrapper : MonoBehaviour {
         DontDestroyOnLoad(gameObject);
 
         Container container = new Container();
-        Extensions.Container = container;
+        IoCExtentions.Container = container;
         Configure(container);
     }
 

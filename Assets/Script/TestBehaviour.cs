@@ -6,19 +6,18 @@ public class TestBehaviour : MonoBehaviour {
 
     [Dependency]
     private ITestClass testClass { get; set; }
-
+    
+    
     [Dependency]
-    private ITestClass2 testClass2 { get; set; }
-
-    public static int startCalls = 0;
-
+    private TestClass2 testClass2 { get; set; }
+    
     void Awake() {
         this.Inject();
     }
 
     void Start() {
-        startCalls++;
         Assert.IsNotNull(testClass);
+        Assert.IsNotNull((testClass as TestClass).testClass2);
         Assert.IsNotNull(testClass2);
     }
 
