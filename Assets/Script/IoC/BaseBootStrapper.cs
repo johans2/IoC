@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
-using System.Collections;
+using CakewalkIoC.Injection;
 
-public abstract class BaseBootStrapper : MonoBehaviour {
+namespace CakewalkIoC.Core {
 
-    void Awake() {
-        DontDestroyOnLoad(gameObject);
+    public abstract class BaseBootStrapper : MonoBehaviour {
 
-        Container container = new Container();
-        IoCExtentions.Container = container;
-        Configure(container);
-    }
+        void Awake() {
+            DontDestroyOnLoad(gameObject);
 
-    public abstract void Configure(Container container);
+            Container container = new Container();
+            IoCExtentions.Container = container;
+            Configure(container);
+        }
 
+        public abstract void Configure(Container container);
+
+    } 
 }

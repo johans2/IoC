@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public interface ITestClass2 {
+public interface IExampleClass {
     
 }

@@ -3,6 +3,8 @@ using System.Collections;
 using NUnit.Framework;
 using System.Reflection;
 using System;
+using CakewalkIoC.Core;
+using CakewalkIoC.Exceptions;
 
 [TestFixture]
 internal class ContainerTest {
@@ -156,6 +158,8 @@ internal class ContainerTest {
         Assert.AreSame(mock4.mock6, mock5.mock6);
     }
 
+
+
     internal class MockClass7 {
         public MockClass7(MockClass8 mock8) { }
     }
@@ -165,7 +169,12 @@ internal class ContainerTest {
     }
 
     internal class MockClass9 {
-        public MockClass9(MockClass8 mock8) { }
+        // MockClass 9 creates a circular dependency to MockClass7
+        public MockClass9(MockClass10 mock10, MockClass7 mock7) { }
+    }
+
+    internal class MockClass10 {
+        public MockClass10() { }
     }
 
     [Test]
@@ -175,6 +184,7 @@ internal class ContainerTest {
         container.Register<MockClass7>();
         container.Register<MockClass8>();
         container.Register<MockClass9>();
+        container.Register<MockClass10>();
 
         container.Resolve<MockClass7>();
     }

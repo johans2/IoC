@@ -1,11 +1,16 @@
 ﻿using UnityEngine;
+using CakewalkIoC.Core;
 
-public static class IoCExtentions {
+namespace CakewalkIoC.Injection {
 
-    public static Container Container { get; set; }
+    public static class IoCExtentions {
 
-    public static void Inject<T>(this T monoBehaviour) where T : MonoBehaviour {
-        Debug.Log("Injected");
-        Container.InjectProperties(monoBehaviour);
-    }    
+        public static Container Container { get; set; }
+
+        public static void Inject<T>(this T monoBehaviour) where T : MonoBehaviour {
+            Debug.Log("Injected");
+            Container.InjectProperties(monoBehaviour);
+        }
+    } 
+
 }

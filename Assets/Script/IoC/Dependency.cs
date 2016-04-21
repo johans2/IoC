@@ -1,8 +1,12 @@
 ﻿using System;
 
-[AttributeUsage(AttributeTargets.Property)]
-public class Dependency : Attribute {
+namespace CakewalkIoC.Injection {
 
-    public Dependency() { }
-    
+    [AttributeUsage(AttributeTargets.Property)]
+    public class Dependency : Attribute {
+
+        public Dependency() { }
+
+    }
+
 }
