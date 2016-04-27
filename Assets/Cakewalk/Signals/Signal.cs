@@ -3,6 +3,37 @@
 namespace CakewalkIoC.Signal {
 
     /// <summary>
+    /// Basic signal with no parameters.
+    /// </summary>
+    public class Signal {
+
+        public delegate void SignalDelegate();
+        private event SignalDelegate SendSignal;
+
+        /// <summary>
+        /// Add a unique listener to the signal.
+        /// </summary>
+        public void AddListener(SignalDelegate listener) {
+            if(SendSignal == null) {
+                SendSignal += listener;
+            }
+            else if(!SendSignal.GetInvocationList().Contains(listener)) {
+                SendSignal += listener;
+            }
+        }
+
+        public void RemoveListener(SignalDelegate listener) {
+            SendSignal -= listener;
+        }
+
+        public void Dispatch() {
+            if(SendSignal != null) {
+                SendSignal();
+            }
+        }
+    }
+
+    /// <summary>
     /// Basic signal with one parameter.
     /// </summary>
     public class Signal<T> {
@@ -31,7 +62,6 @@ namespace CakewalkIoC.Signal {
                 SendSignal(item);
             }
         }
-
     }
 
     /// <summary>
@@ -63,7 +93,6 @@ namespace CakewalkIoC.Signal {
                 SendSignal(item1, item2);
             }
         }
-
     }
 
     /// <summary>
@@ -95,7 +124,6 @@ namespace CakewalkIoC.Signal {
                 SendSignal(item1, item2, item3);
             }
         }
-
     }
 
     /// <summary>
@@ -127,6 +155,5 @@ namespace CakewalkIoC.Signal {
                 SendSignal(item1, item2, item3, item4);
             }
         }
-
     } 
 }
