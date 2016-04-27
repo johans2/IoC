@@ -17,7 +17,4 @@ public class SignalListener : MonoBehaviour {
             Debug.Log(ToString() + " GOT NOTIFICATION -> text: " + text + "   number: " + number);
         }
     }
-
-    void cannor() { }
-
 }
