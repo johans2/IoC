@@ -5,15 +5,11 @@ namespace CakewalkIoC.Core {
 
     public abstract class BaseBootStrapper : MonoBehaviour {
 
-        GameObject Instance;
+        BaseBootStrapper Instance;
 
         void Awake() {
-            if(Instance != null) {
-                Destroy(gameObject);
-            }
-            else {
-                Instance = gameObject;
-                DontDestroyOnLoad(gameObject);
+            if(Instance == null) {
+                Instance = this;
                 Container container = new Container();
                 IoCExtentions.Container = container;
                 Configure(container);
