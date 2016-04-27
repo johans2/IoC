@@ -1,16 +1,21 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System;
-
 public class SignalListener : MonoBehaviour {
 
+    public int maxNum = 5;
+
 	void Start () {
-        SignalSender.TestSignal.AddListener(OnSignal);
+        Debug.Log(ToString() + "Adding listener..");
         SignalSender.TestSignal.AddListener(OnSignal);
     }
     
     private void OnSignal(string text, int number) {
-        Debug.Log(ToString() + " GOT NOTIFICATION -> text: " + text + "   number: " + number);
+        if(number > maxNum) {
+            Debug.Log(ToString() + " Removing listener..");
+            SignalSender.TestSignal.RemoveListener(OnSignal);
+        }
+        else {
+            Debug.Log(ToString() + " GOT NOTIFICATION -> text: " + text + "   number: " + number);
+        }
     }
 
     void cannor() { }
