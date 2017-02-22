@@ -4,6 +4,7 @@ using System.Linq;
 using System;
 using CakewalkIoC.Exceptions;
 using CakewalkIoC.Injection;
+using UnityEngine;
 
 namespace CakewalkIoC.Core {
 
@@ -99,15 +100,25 @@ namespace CakewalkIoC.Core {
             if(!Registrations.TryGetValue(type, out implementation)) {
                 throw new NullBindingException("Attempt to instanciate a null-binding. " + type.ToString() + " is not registered.");
             }
+            
+            if(implementation.IsSubclassOf(typeof(MonoBehaviour))) {
+                GameObject go = new GameObject();
+                go.AddComponent(implementation);
+                go.name = implementation.Name;
+                instance = go.GetComponent(implementation);
+            }
+            else {
+                ConstructorInfo constructor = GetConstructor(implementation);
+                object[] dependencies = ResolvedDependencies(constructor);
 
-            ConstructorInfo constructor = GetConstructor(implementation);
-            object[] dependencies = ResolvedDependencies(constructor);
+                if(dependencies.Length < 1) {
+                    dependencyChain.Clear();
+                }
 
-            if(dependencies.Length < 1) {
-                dependencyChain.Clear();
+                instance = constructor.Invoke(dependencies);
             }
 
-            instance = constructor.Invoke(dependencies);
+            
             Instances.Add(type, instance);
 
             return instance;

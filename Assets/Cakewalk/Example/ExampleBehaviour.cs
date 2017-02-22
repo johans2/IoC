@@ -7,9 +7,11 @@ public class ExampleBehaviour : MonoBehaviour {
     [Dependency]
     private IExampleClass exampleClass { get; set; }
     
-    
     [Dependency]
     private ExampleClass2 exampleClass2 { get; set; }
+    
+    [Dependency]
+    private ExampleDependencyBehaviour dependencyBehaviour { get; set; }
     
     void Awake() {
         this.Inject();
@@ -19,6 +21,7 @@ public class ExampleBehaviour : MonoBehaviour {
         Assert.IsNotNull(exampleClass);
         Assert.IsNotNull((exampleClass as ExampleClass).testClass2);
         Assert.IsNotNull(exampleClass2);
+        Assert.IsNotNull(dependencyBehaviour);
     }
 
     void Update() {

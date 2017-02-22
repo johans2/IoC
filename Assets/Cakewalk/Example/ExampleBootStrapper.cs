@@ -11,6 +11,8 @@ public class ExampleBootStrapper : BaseBootStrapper {
         // container.Register<TestClass2>();
         container.Register<IExampleClass, ExampleClass>();
         container.Register<ExampleClass2>();
+        container.Register<ExampleClass3>();
+        container.Register<ExampleDependencyBehaviour>();
 
     }
     
