@@ -9,15 +9,64 @@ using UnityEngine;
 namespace CakewalkIoC.Core {
 
     public class Container {
-
+        
         public Dictionary<Type, Type> Registrations { get; private set; }
         public Dictionary<Type, object> Instances { get; private set; }
+
+        public Dictionary<Type, GameObject> PrefabsInstances { get; private set; }
+
         private List<Type> dependencyChain;
 
         public Container() {
             Registrations = new Dictionary<Type, Type>();
             Instances = new Dictionary<Type, object>();
+            PrefabsInstances = new Dictionary<Type, GameObject>();
             dependencyChain = new List<Type>();
+        }
+        
+        public void CreateDependencyGameObjects(GameObjectDependency[] gameObjectDependencies) {
+
+            for(int i = 0; i < gameObjectDependencies.Length; i++) {
+                MonoBehaviour script = gameObjectDependencies[i].script;
+                GameObject prefab = gameObjectDependencies[i].prefab;
+
+                // Validate
+                ValidateGameObjectDependencies(script, prefab);
+
+                // Create
+                GameObject instance = UnityEngine.Object.Instantiate(prefab);
+                UnityEngine.Object.DontDestroyOnLoad(instance);
+
+                // Add to dict
+                PrefabsInstances.Add(script.GetType(), instance);
+            }
+        }
+
+        private void ValidateGameObjectDependencies(MonoBehaviour script, GameObject prefab) {
+            if(script == null || prefab == null) {
+                throw new GameObjectRegistrationException(string.Format("Unable to map gameobject or script that it null. Behaviour: {0}   Mapped to: {1}).", script, prefab));
+            }
+
+            MonoBehaviour[] behaviours = prefab.GetComponents<MonoBehaviour>();
+            if(behaviours.Length == 0) {
+                throw new GameObjectRegistrationException(string.Format("Prefab {0} has no behaviours attached to it.", prefab.name));
+            }
+
+            for(int i = 0; i < behaviours.Length; i++) {
+                Type type = behaviours[i].GetType();
+                
+                if(!type.IsSubclassOf(typeof(MonoBehaviour))) {
+                    throw new GameObjectRegistrationException(string.Format("Behaviour {0} (mapped to {1}) is not a MonobBehaviour", type.ToString(), prefab.name));
+                }
+                
+                if(!prefab.GetComponent(type)) {
+                    throw new GameObjectRegistrationException(string.Format("Behaviour {0} is mapped to prefab {1} but not attached to it.", type.ToString(), prefab.name));
+                }
+
+                if(PrefabsInstances.ContainsKey(type)) {
+                    throw new GameObjectRegistrationException(string.Format("Behaviour {0} (mapped to {1}) is already mapped to {2}", type.ToString(), prefab.name, PrefabsInstances[type].name));
+                }
+            }
         }
 
         /// <summary>
@@ -85,12 +134,17 @@ namespace CakewalkIoC.Core {
         /// </summary>
         /// <param name="type">Type to resolve.</param>
         private object Resolve(Type type) {
-            object instance;
 
+            object instance;
             if(Instances.TryGetValue(type, out instance)) {
                 return instance;
             }
-
+            
+            GameObject goInstance;
+            if(PrefabsInstances.TryGetValue(type, out goInstance)) {
+                return goInstance;
+            }
+            
             if(dependencyChain.Contains(type)) {
                 throw new CircularDependencyException("Circular dependency in " + type.ToString());
             }
