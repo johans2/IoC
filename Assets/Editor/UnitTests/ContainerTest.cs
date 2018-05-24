@@ -178,24 +178,27 @@ internal class ContainerTest {
     }
 
     [Test]
-    [ExpectedException(typeof(CircularDependencyException))]
     public void CircularDependency() {
-        // MockClass7 has a circular dependency.
-        container.Register<MockClass7>();
-        container.Register<MockClass8>();
-        container.Register<MockClass9>();
-        container.Register<MockClass10>();
+        Assert.Throws<CircularDependencyException>(() => {
+            // MockClass7 has a circular dependency.
+            container.Register<MockClass7>();
+            container.Register<MockClass8>();
+            container.Register<MockClass9>();
+            container.Register<MockClass10>();
 
-        container.Resolve<MockClass7>();
+            container.Resolve<MockClass7>();
+
+        });
     }
 
     [Test]
-    [ExpectedException(typeof(NullBindingException))]
     public void NullBinding() {
-        // Don't register nessessary dependency IMockClass3
-        container.Register<IMockClass1, MockClass1>();
-        container.Register<IMockClass2, MockClass2>();
+        Assert.Throws<NullBindingException>(() => {
+            // Don't register nessessary dependency IMockClass3
+            container.Register<IMockClass1, MockClass1>();
+            container.Register<IMockClass2, MockClass2>();
 
-        container.Resolve<IMockClass1>();
+            container.Resolve<IMockClass1>();
+        });
     }
 }
