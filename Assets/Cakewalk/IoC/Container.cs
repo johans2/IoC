@@ -23,16 +23,29 @@ namespace CakewalkIoC.Core {
             dependencyChain = new List<Type>();
         }
 
+        public void RegisterPrefab(MonoBehaviour mb) {
+
+            var prefabNameType = Assembly.GetAssembly(typeof(TestBootStrapper)).GetType(mb.name);
+            
+
+            var registerMethod = GetType().GetMethod("RegisterPrefabWithBehaviour", BindingFlags.NonPublic | BindingFlags.Instance);
+            var generic = registerMethod.MakeGenericMethod(prefabNameType);
+            generic.Invoke(this, new object[] { mb.gameObject });
+
+
+        }
+
         /// <summary>
         /// Register a MonoBehaviour and its specified prefab.
         /// </summary>
         /// <typeparam name="TBehaviour">The specified MonoBehaviour available for injection.</typeparam>
         /// <param name="prefab">The specified prefab the that will be instantiated with the MonoBehaviour attached to it.</param>
-        public void RegisterPrefab<TBehaviour>(GameObject prefab) where TBehaviour : MonoBehaviour {
+        private void RegisterPrefabWithBehaviour<TBehaviour>(GameObject prefab) where TBehaviour : MonoBehaviour {
             ValidatePrefabDependencies<TBehaviour>(prefab);
             PrefabRegistrations.Add(typeof(TBehaviour), prefab);
         }
 
+        /*
         /// <summary>
         /// Register a MonoBehaviour, its interface and its specified prefab.
         /// </summary>
@@ -43,7 +56,7 @@ namespace CakewalkIoC.Core {
             ValidatePrefabDependencies<TBehaviour>(prefab);
             PrefabRegistrations.Add(typeof(TInterface), prefab);
         }
-
+        */
         private void ValidatePrefabDependencies<TBehaviour>(GameObject prefab) where TBehaviour : Component {
             if(prefab == null) {
                 throw new GameObjectRegistrationException(string.Format("Registered dependency prefab {0} is null." , prefab));

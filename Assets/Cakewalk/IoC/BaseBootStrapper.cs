@@ -5,16 +5,8 @@ using System;
 
 namespace CakewalkIoC.Core {
     
-    [System.Serializable]
-    public struct PrefabDependency {
-        public UnityEngine.Object script;
-        public GameObject prefab;
-    }
-
     public abstract class BaseBootStrapper : MonoBehaviour {
-
-        public PrefabDependency[] derp;
-
+        
         BaseBootStrapper Instance;
         
         void Awake() {

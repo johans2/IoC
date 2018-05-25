@@ -20,9 +20,9 @@ public class IntegrationTests {
 
         GameObject.Instantiate(goWithDependencies);
 
-        GameObject GO1 = GameObject.Find("Dependency1(Clone)");
-        GameObject GO2 = GameObject.Find("Dependency2(Clone)");
-        GameObject GO3 = GameObject.Find("Dependency3(Clone)");
+        GameObject GO1 = GameObject.Find("TestBehaviour1(Clone)");
+        GameObject GO2 = GameObject.Find("TestBehaviour2(Clone)");
+        GameObject GO3 = GameObject.Find("TestBehaviour3(Clone)");
         
         // Check that the dependencies has been created.
         Assert.IsNotNull(GO1);
@@ -33,9 +33,9 @@ public class IntegrationTests {
         Assert.IsTrue(Object.ReferenceEquals(GO1.GetComponent<TestBehaviour1>().dep3, GO2.GetComponent<TestBehaviour2>().dep3));
 
         GameObject.DestroyImmediate(bootStrapper);
-        GameObject.DestroyImmediate(GameObject.Find("Dependency1(Clone)"));
-        GameObject.DestroyImmediate(GameObject.Find("Dependency2(Clone)"));
-        GameObject.DestroyImmediate(GameObject.Find("Dependency3(Clone)"));
+        GameObject.DestroyImmediate(GO1);
+        GameObject.DestroyImmediate(GO2);
+        GameObject.DestroyImmediate(GO3);
 
         yield return null;
 	}

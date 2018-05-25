@@ -16,7 +16,7 @@ public class TestBootStrapper : BaseBootStrapper {
 
     public override void Configure(Container container) {
         //container.RegisterPrefab<TestBehaviour1>(testprefab1);
-
+        /*
         var prefabNameType = System.Reflection.Assembly.GetAssembly(typeof(TestBootStrapper)).GetType(janne.name);
 
         var method = container.GetType().GetMethod("RegisterPrefab");
@@ -27,9 +27,13 @@ public class TestBootStrapper : BaseBootStrapper {
 
         container.RegisterPrefab<TestBehaviour2>(testprefab2);
         container.RegisterPrefab<TestBehaviour3>(testprefab3);
+        */
 
+        for(int i = 0; i < systems.Length; i++) {
+            container.RegisterPrefab(systems[i]);
+        }
     }
-
+    /*
     private void OnValidate() {
 
         Debug.Log("janne type=" + janne.GetType());
@@ -38,5 +42,5 @@ public class TestBootStrapper : BaseBootStrapper {
         MonoBehaviour mb = (MonoBehaviour)(object)janne;
         var c = mb.GetComponent(prefabNameType);
         Debug.Log("Compontn=" + c);
-    }
+    }*/
 }
