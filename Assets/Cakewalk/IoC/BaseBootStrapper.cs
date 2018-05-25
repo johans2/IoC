@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using CakewalkIoC.Injection;
-
+using System;
 
 namespace CakewalkIoC.Core {
-
+    
     [System.Serializable]
-    public struct GameObjectDependency {
-        public MonoBehaviour script;
+    public struct PrefabDependency {
+        public UnityEngine.Object script;
         public GameObject prefab;
     }
-    
+
     public abstract class BaseBootStrapper : MonoBehaviour {
 
-        public GameObjectDependency[] gameObjectDependencies;
-        
+        public PrefabDependency[] derp;
+
         BaseBootStrapper Instance;
         
         void Awake() {
@@ -22,13 +22,10 @@ namespace CakewalkIoC.Core {
                 Instance = this;
                 Container container = new Container();
                 IoCExtentions.Container = container;
-                container.CreateDependencyGameObjects(gameObjectDependencies);
                 Configure(container);
             }
         }
 
-
-        public virtual void Configure(Container container) { }
-
+        public abstract void Configure(Container container);
     } 
 }

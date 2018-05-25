@@ -11,62 +11,79 @@ namespace CakewalkIoC.Core {
     public class Container {
         
         public Dictionary<Type, Type> Registrations { get; private set; }
+        public Dictionary<Type, GameObject> PrefabRegistrations { get; private set; }
         public Dictionary<Type, object> Instances { get; private set; }
-
-        public Dictionary<Type, GameObject> PrefabsInstances { get; private set; }
-
+        
         private List<Type> dependencyChain;
 
         public Container() {
             Registrations = new Dictionary<Type, Type>();
             Instances = new Dictionary<Type, object>();
-            PrefabsInstances = new Dictionary<Type, GameObject>();
+            PrefabRegistrations = new Dictionary<Type, GameObject>();
             dependencyChain = new List<Type>();
         }
-        
-        public void CreateDependencyGameObjects(GameObjectDependency[] gameObjectDependencies) {
 
-            for(int i = 0; i < gameObjectDependencies.Length; i++) {
-                MonoBehaviour script = gameObjectDependencies[i].script;
-                GameObject prefab = gameObjectDependencies[i].prefab;
+        /// <summary>
+        /// Register a MonoBehaviour and its specified prefab.
+        /// </summary>
+        /// <typeparam name="TBehaviour">The specified MonoBehaviour available for injection.</typeparam>
+        /// <param name="prefab">The specified prefab the that will be instantiated with the MonoBehaviour attached to it.</param>
+        public void RegisterPrefab<TBehaviour>(GameObject prefab) where TBehaviour : MonoBehaviour {
+            ValidatePrefabDependencies<TBehaviour>(prefab);
+            PrefabRegistrations.Add(typeof(TBehaviour), prefab);
+        }
 
-                // Validate
-                ValidateGameObjectDependencies(script, prefab);
+        /// <summary>
+        /// Register a MonoBehaviour, its interface and its specified prefab.
+        /// </summary>
+        /// <typeparam name="TInterface">The specified Interface available for injection.</typeparam>
+        /// <typeparam name="TBehaviour">The MonoBehaviour implementation of the interface.</typeparam>
+        /// <param name="prefab">The specified prefab the that will be instantiated with the MonoBehaviour attached to it.</param>
+        public void RegisterPrefab<TInterface , TBehaviour>(GameObject prefab) where TBehaviour : MonoBehaviour, TInterface {
+            ValidatePrefabDependencies<TBehaviour>(prefab);
+            PrefabRegistrations.Add(typeof(TInterface), prefab);
+        }
 
-                // Create
-                GameObject instance = UnityEngine.Object.Instantiate(prefab);
-                UnityEngine.Object.DontDestroyOnLoad(instance);
+        private void ValidatePrefabDependencies<TBehaviour>(GameObject prefab) where TBehaviour : Component {
+            if(prefab == null) {
+                throw new GameObjectRegistrationException(string.Format("Registered dependency prefab {0} is null." , prefab));
+            }
+            
+            Component attachedBehaviour = prefab.GetComponent<TBehaviour>();
+            
+            if(attachedBehaviour == null) {
+                throw new GameObjectRegistrationException(string.Format("Prefab {0} has no behaviour of type {1} attached to it.", prefab.name, typeof(TBehaviour).ToString()));
+            }
 
-                // Add to dict
-                PrefabsInstances.Add(script.GetType(), instance);
+            CheckCircularDependencies(typeof(TBehaviour));
+
+            if(PrefabRegistrations.ContainsKey(typeof(TBehaviour))) {
+                throw new GameObjectRegistrationException(string.Format("Behaviour {0} (mapped to {1}) is already mapped to prefab {2}", typeof(TBehaviour).ToString(), prefab.name, PrefabRegistrations[typeof(TBehaviour)].name));
             }
         }
 
-        private void ValidateGameObjectDependencies(MonoBehaviour script, GameObject prefab) {
-            if(script == null || prefab == null) {
-                throw new GameObjectRegistrationException(string.Format("Unable to map gameobject or script that it null. Behaviour: {0}   Mapped to: {1}).", script, prefab));
-            }
-
-            MonoBehaviour[] behaviours = prefab.GetComponents<MonoBehaviour>();
-            if(behaviours.Length == 0) {
-                throw new GameObjectRegistrationException(string.Format("Prefab {0} has no behaviours attached to it.", prefab.name));
-            }
-
-            for(int i = 0; i < behaviours.Length; i++) {
-                Type type = behaviours[i].GetType();
+        /// <summary>
+        /// Check that the given Type has no circular dependencies. Throws CircularDependencyException() if it has.
+        /// </summary>
+        /// <param name="type">The Type to be checked.</param>
+        public void CheckCircularDependencies(Type type) {
+            PropertyInfo[] properties = GetDependencyProperties(type);
+            
+            for(int i = 0; i < properties.Length; i++) {
                 
-                if(!type.IsSubclassOf(typeof(MonoBehaviour))) {
-                    throw new GameObjectRegistrationException(string.Format("Behaviour {0} (mapped to {1}) is not a MonobBehaviour", type.ToString(), prefab.name));
+                Type dependency = properties[i].PropertyType;
+
+                if(dependencyChain.Contains(dependency)) {
+                    throw new CircularDependencyException("Circular dependency in " + type.ToString());
                 }
                 
-                if(!prefab.GetComponent(type)) {
-                    throw new GameObjectRegistrationException(string.Format("Behaviour {0} is mapped to prefab {1} but not attached to it.", type.ToString(), prefab.name));
-                }
+                dependencyChain.Add(dependency);
 
-                if(PrefabsInstances.ContainsKey(type)) {
-                    throw new GameObjectRegistrationException(string.Format("Behaviour {0} (mapped to {1}) is already mapped to {2}", type.ToString(), prefab.name, PrefabsInstances[type].name));
-                }
+                CheckCircularDependencies(dependency);
+
             }
+
+            dependencyChain.Clear();
         }
 
         /// <summary>
@@ -95,16 +112,22 @@ namespace CakewalkIoC.Core {
         /// Get the properties marked with [Dependency] attribute and inject them.
         /// </summary>
         /// <param name="obj">Object to inject into.</param>
-        public void InjectProperties(object obj) {
+        public void InjectDependencies(object obj) {
             Type type = obj.GetType();
 
-            PropertyInfo[] properties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
-                .Where(prop => prop.IsDefined(typeof(Dependency), false)).ToArray();
+            PropertyInfo[] properties = GetDependencyProperties(type);
 
             foreach(PropertyInfo property in properties) {
                 object instance = Resolve(property.PropertyType);
                 property.SetValue(obj, instance, null);
             }
+        }
+
+        private PropertyInfo[] GetDependencyProperties(Type type) {
+            PropertyInfo[] properties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+                .Where(prop => prop.IsDefined(typeof(Dependency), false)).ToArray();
+
+            return properties;
         }
 
         /// <summary>
@@ -125,8 +148,7 @@ namespace CakewalkIoC.Core {
         /// </summary>
         /// <typeparam name="T">Type to resolve.</typeparam>
         public object Resolve<T>() {
-            Type type = typeof(T);
-            return Resolve(type);
+            return Resolve(typeof(T));
         }
 
         /// <summary>
@@ -139,29 +161,30 @@ namespace CakewalkIoC.Core {
             if(Instances.TryGetValue(type, out instance)) {
                 return instance;
             }
-            
-            GameObject goInstance;
-            if(PrefabsInstances.TryGetValue(type, out goInstance)) {
-                return goInstance;
-            }
-            
-            if(dependencyChain.Contains(type)) {
-                throw new CircularDependencyException("Circular dependency in " + type.ToString());
-            }
-            dependencyChain.Add(type);
 
-            Type implementation;
-            if(!Registrations.TryGetValue(type, out implementation)) {
-                throw new NullBindingException("Attempt to instanciate a null-binding. " + type.ToString() + " is not registered.");
-            }
-            
-            if(implementation.IsSubclassOf(typeof(MonoBehaviour))) {
-                GameObject go = new GameObject();
-                go.AddComponent(implementation);
-                go.name = implementation.Name;
-                instance = go.GetComponent(implementation);
+            if(type.IsSubclassOf(typeof(MonoBehaviour))) {
+                // Instantiate the prefab
+                GameObject prefab;
+                if(!PrefabRegistrations.TryGetValue(type, out prefab)) {
+                    throw new NullBindingException("Attempt to instanciate a null-binding. " + type.ToString() + " is not registered to a prefab.");
+                }
+                
+                GameObject gameObject = GameObject.Instantiate(prefab);
+                GameObject.DontDestroyOnLoad(gameObject);
+                instance = gameObject.GetComponent(type);
+
+                if(GetDependencyProperties(type).Length == 0) {
+                    dependencyChain.Clear();
+                }
+                
             }
             else {
+                // Instantiate the object
+                Type implementation;
+                if(!Registrations.TryGetValue(type, out implementation)) {
+                    throw new NullBindingException("Attempt to instanciate a null-binding. " + type.ToString() + " is not registered.");
+                }
+
                 ConstructorInfo constructor = GetConstructor(implementation);
                 object[] dependencies = ResolvedDependencies(constructor);
 
@@ -171,10 +194,8 @@ namespace CakewalkIoC.Core {
 
                 instance = constructor.Invoke(dependencies);
             }
-
             
             Instances.Add(type, instance);
-
             return instance;
         }
 

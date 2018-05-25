@@ -9,7 +9,7 @@ public class ExampleBehaviour2 : MonoBehaviour {
     public ExampleClass3 classWithDependencyToGameObject { get; set; } // Detta skulle kunna vara en prefab.
 
     void Awake() {
-        this.Inject();
+        this.InjectDependencies();
     }
 
 }

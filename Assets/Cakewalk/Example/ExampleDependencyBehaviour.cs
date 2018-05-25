@@ -10,7 +10,7 @@ public class ExampleDependencyBehaviour : MonoBehaviour {
     private IExampleClass exampleClass { get; set; }
 
     void Awake() {
-        this.Inject();
+        this.InjectDependencies();
         Debug.Log("Awake called in dependency behaviour!");
         Assert.IsNotNull(exampleClass); 
     }

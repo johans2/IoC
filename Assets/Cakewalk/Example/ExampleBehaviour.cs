@@ -14,7 +14,7 @@ public class ExampleBehaviour : MonoBehaviour {
     private ExampleDependencyBehaviour dependencyBehaviour { get; set; }
     
     void Awake() {
-        this.Inject();
+        this.InjectDependencies();
     }
 
     void Start() {
