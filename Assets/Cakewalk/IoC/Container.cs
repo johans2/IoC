@@ -72,6 +72,15 @@ namespace Cakewalk.IoC.Core {
         }
         
         /// <summary>
+        /// Instantiate all registered prefabs.
+        /// </summary>
+        public void InstantiateAllRegistrations() {
+            foreach(var kvp in PrefabRegistrations) {
+                Resolve(kvp.Key);
+            }
+        }
+
+        /// <summary>
         /// Register a MonoBehaviour and its specified prefab.
         /// </summary>
         /// <typeparam name="TBehaviour">The specified MonoBehaviour available for injection.</typeparam>

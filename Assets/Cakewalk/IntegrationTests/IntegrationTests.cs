@@ -52,6 +52,53 @@ public class IntegrationTests {
         yield return null;
     }
 
+    [UnityTest]
+    public IEnumerator AutoInstantiateTRUE() {
+        GameObject bootStrapperPrefab = Resources.Load("ValidTestBootStrapper") as GameObject;
+        
+        BootStrapper bs = bootStrapperPrefab.GetComponent<BootStrapper>();
+        bs.autoInstantiate = true;
 
+        GameObject bootStrapper = GameObject.Instantiate(bootStrapperPrefab);
+        
+        GameObject GO1 = GameObject.Find("TestBehaviour1(Clone)");
+        GameObject GO2 = GameObject.Find("TestBehaviour2(Clone)");
+        GameObject GO3 = GameObject.Find("TestBehaviour3(Clone)");
+
+        // Check that the dependencies has been created.
+        Assert.IsNotNull(GO1);
+        Assert.IsNotNull(GO2);
+        Assert.IsNotNull(GO3);
+        
+        GameObject.DestroyImmediate(bootStrapper);
+        GameObject.DestroyImmediate(GO1);
+        GameObject.DestroyImmediate(GO2);
+        GameObject.DestroyImmediate(GO3);
+
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator AutoInstantiateFALSE() {
+        GameObject bootStrapperPrefab = Resources.Load("ValidTestBootStrapper") as GameObject;
+
+        BootStrapper bs = bootStrapperPrefab.GetComponent<BootStrapper>();
+        bs.autoInstantiate = false;
+
+        GameObject bootStrapper = GameObject.Instantiate(bootStrapperPrefab);
+
+        GameObject GO1 = GameObject.Find("TestBehaviour1(Clone)");
+        GameObject GO2 = GameObject.Find("TestBehaviour2(Clone)");
+        GameObject GO3 = GameObject.Find("TestBehaviour3(Clone)");
+
+        // Check that the dependencies has been created.
+        Assert.IsNull(GO1);
+        Assert.IsNull(GO2);
+        Assert.IsNull(GO3);
+        
+        GameObject.DestroyImmediate(bootStrapper);
+
+        yield return null;
+    }
 
 }

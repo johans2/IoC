@@ -9,7 +9,8 @@ namespace Cakewalk.IoC {
     public class BootStrapper : MonoBehaviour {
 
         public MonoBehaviour[] systems;
-        
+        public bool autoInstantiate = false;
+
         static BootStrapper Instance;
 
         void Awake() {
@@ -21,10 +22,15 @@ namespace Cakewalk.IoC {
                 for(int i = 0; i < systems.Length; i++) {
                     container.RegisterPrefab(systems[i]);
                 }
+
+                if(autoInstantiate) {
+                    container.InstantiateAllRegistrations();
+                }
             }
             else {
                 DestroyImmediate(gameObject);
             }
         }
+        
     } 
 }
