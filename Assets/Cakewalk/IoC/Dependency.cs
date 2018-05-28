@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CakewalkIoC.Injection {
+namespace Cakewalk.IoC {
 
     [AttributeUsage(AttributeTargets.Property)]
     public class Dependency : Attribute {

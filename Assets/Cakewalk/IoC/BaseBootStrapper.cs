@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using CakewalkIoC.Injection;
+using Cakewalk.IoC;
 using System;
+using Cakewalk.IoC.Core;
 
-namespace CakewalkIoC.Core {
+namespace Cakewalk.IoC {
     
     public abstract class BaseBootStrapper : MonoBehaviour {
         

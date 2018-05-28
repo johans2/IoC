@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CakewalkIoC.Exceptions {
+namespace Cakewalk.IoC.Exceptions {
     
     /// <summary>
     /// Exception thrown when something goes wrong when resolving dependencies.

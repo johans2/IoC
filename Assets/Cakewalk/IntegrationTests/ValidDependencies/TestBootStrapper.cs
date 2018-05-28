@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using CakewalkIoC.Core;
+using Cakewalk.IoC;
+using Cakewalk.IoC.Core;
 
 public class TestBootStrapper : BaseBootStrapper {
     
@@ -12,4 +13,5 @@ public class TestBootStrapper : BaseBootStrapper {
             container.RegisterPrefab(systems[i]);
         }
     }
+    
 }

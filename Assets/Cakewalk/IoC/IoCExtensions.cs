@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using CakewalkIoC.Core;
+using Cakewalk.IoC.Core;
 
-namespace CakewalkIoC.Injection {
+namespace Cakewalk.IoC {
 
     public static class IoCExtentions {
 

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using CakewalkIoC.Injection;
+using Cakewalk.IoC;
 
 [System.Serializable]
 public class TestBehaviour1 : MonoBehaviour {

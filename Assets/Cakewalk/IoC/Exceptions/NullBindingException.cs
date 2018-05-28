@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CakewalkIoC.Exceptions {
+namespace Cakewalk.IoC.Exceptions {
     
     /// <summary>
     /// Exception thrown when trying to inject or resolve a type that has not been registered in the container.

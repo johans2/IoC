@@ -3,9 +3,9 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using CakewalkIoC.Exceptions;
-using CakewalkIoC.Core;
-using CakewalkIoC.Injection;
+using Cakewalk.IoC.Exceptions;
+using Cakewalk.IoC.Core;
+using Cakewalk.IoC;
 
 public class IntegrationTests {
     
@@ -45,7 +45,7 @@ public class IntegrationTests {
         
         Container c = new Container();
         
-        Assert.Throws<CakewalkIoC.Exceptions.CircularDependencyException>(() => {
+        Assert.Throws<CircularDependencyException>(() => {
             c.CheckCircularDependencies(typeof(CircularDependencyBehaviour1));
         });
         

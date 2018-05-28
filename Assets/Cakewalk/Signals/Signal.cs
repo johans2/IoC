@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace CakewalkIoC.Signal {
+namespace Cakewalk.Signals {
 
     /// <summary>
     /// Basic signal with no parameters.

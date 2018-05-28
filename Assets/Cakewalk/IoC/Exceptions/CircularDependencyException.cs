@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CakewalkIoC.Exceptions {
+namespace Cakewalk.IoC.Exceptions {
 
     /// <summary>
     /// Excetion thrown when trying to resolve a type that has circular dependencies.
