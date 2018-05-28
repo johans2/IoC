@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Cakewalk.IoC;
-using System;
 using Cakewalk.IoC.Core;
 
 namespace Cakewalk.IoC {
@@ -9,7 +7,7 @@ namespace Cakewalk.IoC {
     public class BootStrapper : MonoBehaviour {
 
         public MonoBehaviour[] systems;
-        public bool autoInstantiate = false;
+        public bool autoInstantiate = true;
 
         static BootStrapper Instance;
 
@@ -32,5 +30,5 @@ namespace Cakewalk.IoC {
             }
         }
         
-    } 
+    }
 }

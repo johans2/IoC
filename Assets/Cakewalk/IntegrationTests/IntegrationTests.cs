@@ -12,10 +12,10 @@ public class IntegrationTests {
 	[UnityTest]
     public IEnumerator CreateDependencyGameObejcts() {
         GameObject bootStrapperPrefab = Resources.Load("ValidTestBootStrapper") as GameObject;
-
+        bootStrapperPrefab.GetComponent<BootStrapper>().autoInstantiate = false;
+        
         GameObject bootStrapper = GameObject.Instantiate(bootStrapperPrefab);
-
-
+        
         GameObject goWithDependencies = Resources.Load("GOWithDependencies") as GameObject;
 
         GameObject.Instantiate(goWithDependencies);
