@@ -26,7 +26,7 @@ namespace Cakewalk.IoC.Core {
         /// </summary>
         /// <param name="mb">The prefab with attach Behaviour (cast to monobehaviour so we can extract the script from it).</param>
         public void RegisterPrefab(MonoBehaviour mb) {
-            var prefabNameType = Assembly.GetAssembly(typeof(TestBootStrapper)).GetType(mb.name);
+            var prefabNameType = Assembly.GetAssembly(typeof(BootStrapper)).GetType(mb.name); // TODO: This restricts injection to the same assembly as the project, e.i. no external dlls.
             var registerMethod = GetType().GetMethod("RegisterPrefabWithBehaviour", BindingFlags.NonPublic | BindingFlags.Instance);
             var generic = registerMethod.MakeGenericMethod(prefabNameType);
             generic.Invoke(this, new object[] { mb.gameObject });

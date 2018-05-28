@@ -6,19 +6,25 @@ using Cakewalk.IoC.Core;
 
 namespace Cakewalk.IoC {
     
-    public abstract class BaseBootStrapper : MonoBehaviour {
+    public class BootStrapper : MonoBehaviour {
+
+        public MonoBehaviour[] systems;
         
-        BaseBootStrapper Instance;
-        
+        static BootStrapper Instance;
+
         void Awake() {
             if(Instance == null) {
                 Instance = this;
                 Container container = new Container();
                 IoCExtentions.Container = container;
-                Configure(container);
+
+                for(int i = 0; i < systems.Length; i++) {
+                    container.RegisterPrefab(systems[i]);
+                }
+            }
+            else {
+                DestroyImmediate(gameObject);
             }
         }
-
-        public abstract void Configure(Container container);
     } 
 }
