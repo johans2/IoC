@@ -13,7 +13,12 @@ public class IntegrationTests {
     public IEnumerator CreateDependencyGameObejcts() {
         GameObject bootStrapperPrefab = Resources.Load("ValidTestBootStrapper") as GameObject;
         bootStrapperPrefab.GetComponent<BootStrapper>().autoInstantiate = false;
-        
+
+        // Prefab values 
+        GameObject behaviour2 = Resources.Load("TestBehaviour2") as GameObject;
+        float prefabValue1 = behaviour2.GetComponent<TestBehaviour2>().prefabValue1;
+        int prefabValue2 = behaviour2.GetComponent<TestBehaviour2>().prefabValue2;
+
         GameObject bootStrapper = GameObject.Instantiate(bootStrapperPrefab);
         
         GameObject goWithDependencies = Resources.Load("GOWithDependencies") as GameObject;
@@ -33,6 +38,10 @@ public class IntegrationTests {
         Assert.IsNotNull(GO1.GetComponent<TestBehaviour1>());
         Assert.IsNotNull(GO2.GetComponent<TestBehaviour2>());
         Assert.IsNotNull(GO3.GetComponent<TestBehaviour3>());
+
+        // Check that the prefab value are correct
+        Assert.AreEqual(prefabValue1, GO2.GetComponent<TestBehaviour2>().prefabValue1);
+        Assert.AreEqual(prefabValue2, GO2.GetComponent<TestBehaviour2>().prefabValue2);
 
         // Check that the references are correct
         Assert.IsTrue(Object.ReferenceEquals(GO1.GetComponent<TestBehaviour1>().dep3, GO2.GetComponent<TestBehaviour2>().dep3));
