@@ -44,7 +44,7 @@ public class IntegrationTests {
         Assert.AreEqual(prefabValue2, GO2.GetComponent<TestBehaviour2>().prefabValue2);
 
         // Check that the references are correct
-        Assert.IsTrue(Object.ReferenceEquals(GO1.GetComponent<TestBehaviour1>().dep3, GO2.GetComponent<TestBehaviour2>().dep3));
+        Assert.IsTrue(Object.ReferenceEquals(GO1.GetComponent<TestBehaviour1>().GetDepValue(), GO2.GetComponent<TestBehaviour2>().GetDepValue()));
 
         GameObject.DestroyImmediate(bootStrapper);
         GameObject.DestroyImmediate(GO1);
@@ -85,7 +85,7 @@ public class IntegrationTests {
         Assert.IsNotNull(GO3);
 
         // Check that the references are correct
-        Assert.IsTrue(Object.ReferenceEquals(GO1.GetComponent<TestBehaviour1>().dep3, GO2.GetComponent<TestBehaviour2>().dep3));
+        Assert.IsTrue(Object.ReferenceEquals(GO1.GetComponent<TestBehaviour1>().GetDepValue(), GO2.GetComponent<TestBehaviour2>().GetDepValue()));
 
         GameObject.DestroyImmediate(bootStrapper);
         GameObject.DestroyImmediate(GO1);

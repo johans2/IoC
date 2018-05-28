@@ -6,7 +6,11 @@ using Cakewalk.IoC;
 [System.Serializable]
 public class TestBehaviour1 : MonoBehaviour {
 
-    [Dependency] public TestBehaviour3 dep3 { get; set; }
+    [Dependency] private TestBehaviour3 dep3;
+
+    public TestBehaviour3 GetDepValue() {
+        return dep3;
+    }
 
 	void Awake () {
         this.InjectDependencies();

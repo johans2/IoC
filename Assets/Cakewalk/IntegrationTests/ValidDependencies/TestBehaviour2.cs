@@ -4,11 +4,14 @@ using UnityEngine;
 using Cakewalk.IoC;
 
 public class TestBehaviour2 : MonoBehaviour {
-    
-    [Dependency] public TestBehaviour3 dep3 { get; set; }
 
     public float prefabValue1 = 4f;
     public int prefabValue2 = 2;
+    [Dependency] private TestBehaviour3 dep3;
+
+    public TestBehaviour3 GetDepValue() {
+        return dep3;
+    }
 
 	void Awake () {
         this.InjectDependencies();

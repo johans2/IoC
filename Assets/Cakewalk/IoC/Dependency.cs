@@ -2,7 +2,7 @@
 
 namespace Cakewalk.IoC {
 
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field)]
     public class Dependency : Attribute {
         public Dependency() { }
     }

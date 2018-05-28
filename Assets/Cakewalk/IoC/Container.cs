@@ -33,17 +33,17 @@ namespace Cakewalk.IoC.Core {
         }
 
         /// <summary>
-        /// Get the properties marked with [Dependency] attribute and inject them.
+        /// Get the fields marked with [Dependency] attribute and inject them.
         /// </summary>
         /// <param name="obj">Object to inject into.</param>
         public void InjectDependencies(object obj) {
             Type type = obj.GetType();
 
-            PropertyInfo[] properties = GetDependencyProperties(type);
+            FieldInfo[] dependencyFields = GetDependencyFields(type);
             
-            foreach(PropertyInfo property in properties) {
-                object instance = Resolve(property.PropertyType);
-                property.SetValue(obj, instance, null);
+            for(int i = 0; i < dependencyFields.Length; i++) {
+                object instance = Resolve(dependencyFields[i].FieldType);
+                dependencyFields[i].SetValue(obj, instance);
             }
         }
         
@@ -52,11 +52,11 @@ namespace Cakewalk.IoC.Core {
         /// </summary>
         /// <param name="type">The Type to be checked.</param>
         public void CheckCircularDependencies(Type type) {
-            PropertyInfo[] properties = GetDependencyProperties(type);
+            FieldInfo[] dependencyFields = GetDependencyFields(type);
             
-            for(int i = 0; i < properties.Length; i++) {
+            for(int i = 0; i < dependencyFields.Length; i++) {
                 
-                Type dependency = properties[i].PropertyType;
+                Type dependency = dependencyFields[i].FieldType;
 
                 if(dependencyChain.Contains(dependency)) {
                     throw new CircularDependencyException("Circular dependency in " + type.ToString());
@@ -112,11 +112,14 @@ namespace Cakewalk.IoC.Core {
                 throw new GameObjectRegistrationException(string.Format("Behaviour {0} (mapped to {1}) is already mapped to prefab {2}", typeof(TBehaviour).ToString(), prefab.name, PrefabRegistrations[typeof(TBehaviour)].name));
             }
         }
-        private PropertyInfo[] GetDependencyProperties(Type type) {
+        private FieldInfo[] GetDependencyFields(Type type) {
+            FieldInfo[] fieldInfo = type.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+                .Where(prop => prop.IsDefined(typeof(Dependency), false)).ToArray();
+            /*
             PropertyInfo[] properties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
                 .Where(prop => prop.IsDefined(typeof(Dependency), false)).ToArray();
-
-            return properties;
+                */
+            return fieldInfo;
         }
 
         /// <summary>
@@ -152,7 +155,7 @@ namespace Cakewalk.IoC.Core {
             GameObject.DontDestroyOnLoad(gameObject);
             instance = gameObject.GetComponent(type);
 
-            if(GetDependencyProperties(type).Length == 0) {
+            if(GetDependencyFields(type).Length == 0) {
                 dependencyChain.Clear();
             }
                 

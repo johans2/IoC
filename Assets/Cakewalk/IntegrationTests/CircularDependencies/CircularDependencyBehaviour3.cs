@@ -5,7 +5,7 @@ using Cakewalk.IoC;
 
 public class CircularDependencyBehaviour3 : MonoBehaviour {
 
-    [Dependency] CircularDependencyBehaviour1 dep1 { get; set; }
+    [Dependency] CircularDependencyBehaviour1 dep1;
     
 	void Awake () {
         this.InjectDependencies();

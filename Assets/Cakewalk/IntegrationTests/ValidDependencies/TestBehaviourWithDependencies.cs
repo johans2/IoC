@@ -5,8 +5,8 @@ using Cakewalk.IoC;
 
 public class TestBehaviourWithDependencies : MonoBehaviour {
 
-    [Dependency] TestBehaviour1 dep1 { get; set; }
-    [Dependency] TestBehaviour2 dep2 { get; set; }
+    [Dependency] TestBehaviour1 dep1;
+    [Dependency] TestBehaviour2 dep2;
 
     void Awake () {
         this.InjectDependencies();
