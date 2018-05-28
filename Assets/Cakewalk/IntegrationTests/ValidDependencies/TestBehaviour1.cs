@@ -8,6 +8,8 @@ public class TestBehaviour1 : MonoBehaviour {
 
     [Dependency] private TestBehaviour3 dep3;
 
+    private float f = 2f;
+
     public TestBehaviour3 GetDepValue() {
         return dep3;
     }
@@ -15,7 +17,11 @@ public class TestBehaviour1 : MonoBehaviour {
 	void Awake () {
         this.InjectDependencies();
 	}
-	
+
+    public float ReturnFloat() {
+        return f;
+    }
+
 	// Update is called once per frame
 	void Update () {
 		

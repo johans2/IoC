@@ -118,4 +118,16 @@ public class IntegrationTests {
         yield return null;
     }
 
+    [UnityTest]
+    public IEnumerator SelfDependencyCheck() {
+
+        Container c = new Container();
+
+        Assert.Throws<SelfDependencyException>(() => {
+            c.CheckCircularDependencies(typeof(SelfReferenceBehaviour));
+        });
+
+        yield return null;
+    }
+
 }

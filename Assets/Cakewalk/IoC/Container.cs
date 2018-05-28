@@ -58,17 +58,37 @@ namespace Cakewalk.IoC.Core {
                 
                 Type dependency = dependencyFields[i].FieldType;
 
-                if(dependencyChain.Contains(dependency)) {
-                    throw new CircularDependencyException("Circular dependency in " + type.ToString());
+                if(dependency == type) {
+                    throw new SelfDependencyException(string.Format("Type {0} has declared itself as a dependency.", type.ToString()));
                 }
-                
-                dependencyChain.Add(dependency);
 
+                if(dependencyChain.Contains(dependency)) {
+                    throw new CircularDependencyException(string.Format("Circular dependency detected: {0}", GetCircularDependencyString(type, dependencyChain)));
+                }
+
+                dependencyChain.Add(dependency);
+                
                 CheckCircularDependencies(dependency);
 
             }
 
             dependencyChain.Clear();
+        }
+
+
+        /// <summary>
+        /// Get a string representation of the whole dependency chain.
+        /// </summary>
+        private string GetCircularDependencyString(Type type, List<Type> dependencyChain) {
+            string chain = type.ToString() + "  ==>  ";
+            for(int i = 0; i < dependencyChain.Count; i++) {
+                
+                chain += dependencyChain[i].ToString();
+                if(i != dependencyChain.Count - 1) {
+                    chain += "  ==>  ";
+                }
+            }
+            return chain;
         }
         
         /// <summary>
