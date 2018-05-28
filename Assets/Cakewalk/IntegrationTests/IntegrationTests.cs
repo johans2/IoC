@@ -29,6 +29,11 @@ public class IntegrationTests {
         Assert.IsNotNull(GO2);
         Assert.IsNotNull(GO3);
 
+        // Check that the components are there
+        Assert.IsNotNull(GO1.GetComponent<TestBehaviour1>());
+        Assert.IsNotNull(GO2.GetComponent<TestBehaviour2>());
+        Assert.IsNotNull(GO3.GetComponent<TestBehaviour3>());
+
         // Check that the references are correct
         Assert.IsTrue(Object.ReferenceEquals(GO1.GetComponent<TestBehaviour1>().dep3, GO2.GetComponent<TestBehaviour2>().dep3));
 
