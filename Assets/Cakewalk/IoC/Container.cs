@@ -132,13 +132,10 @@ namespace Cakewalk.IoC.Core {
                 throw new GameObjectRegistrationException(string.Format("Behaviour {0} (mapped to {1}) is already mapped to prefab {2}", typeof(TBehaviour).ToString(), prefab.name, PrefabRegistrations[typeof(TBehaviour)].name));
             }
         }
-        private FieldInfo[] GetDependencyFields(Type type) {
+        public static FieldInfo[] GetDependencyFields(Type type) {
             FieldInfo[] fieldInfo = type.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
                 .Where(prop => prop.IsDefined(typeof(Dependency), false)).ToArray();
-            /*
-            PropertyInfo[] properties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
-                .Where(prop => prop.IsDefined(typeof(Dependency), false)).ToArray();
-                */
+            
             return fieldInfo;
         }
 
