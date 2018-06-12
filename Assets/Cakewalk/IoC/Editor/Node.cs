@@ -9,20 +9,20 @@ public class Node
     public bool isDragged;
     public bool isSelected;
 
-    public ConnectionPoint inPoint;
-    public ConnectionPoint outPoint;
+    //public ConnectionPoint inPoint;
+    //public ConnectionPoint outPoint;
 
     public GUIStyle style;
     public GUIStyle defaultNodeStyle;
     public GUIStyle selectedNodeStyle;
 
-    public Node(string title, Vector2 position, float width, float height, GUIStyle nodeStyle, GUIStyle selectedStyle, GUIStyle inPointStyle, GUIStyle outPointStyle, Action<ConnectionPoint> OnClickInPoint, Action<ConnectionPoint> OnClickOutPoint)
+    public Node(string title, Vector2 position, float width, float height, GUIStyle nodeStyle, GUIStyle selectedStyle, GUIStyle inPointStyle, GUIStyle outPointStyle/*, Action<ConnectionPoint> OnClickInPoint, Action<ConnectionPoint> OnClickOutPoint*/)
     {
         this.title = title;
         rect = new Rect(position.x, position.y, width, height);
         style = nodeStyle;
-        inPoint = new ConnectionPoint(this, ConnectionPointType.In, inPointStyle, OnClickInPoint);
-        outPoint = new ConnectionPoint(this, ConnectionPointType.Out, outPointStyle, OnClickOutPoint);
+        //inPoint = new ConnectionPoint(this, ConnectionPointType.In, inPointStyle, OnClickInPoint);
+        //outPoint = new ConnectionPoint(this, ConnectionPointType.Out, outPointStyle, OnClickOutPoint);
         defaultNodeStyle = nodeStyle;
         selectedNodeStyle = selectedStyle;
     }
@@ -34,8 +34,8 @@ public class Node
 
     public void Draw()
     {
-        inPoint.Draw();
-        outPoint.Draw();
+        //inPoint.Draw();
+        //outPoint.Draw();
         GUI.Box(rect, title, style);
     }
 

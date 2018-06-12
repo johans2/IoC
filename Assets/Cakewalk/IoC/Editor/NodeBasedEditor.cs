@@ -61,12 +61,19 @@ public class NodeBasedEditor : EditorWindow
             nodes = new List<Node>();
         }
 
+        if(connections == null) {
+            connections = new List<Connection>();
+        }
+        if(alreadyDrawnNodes == null) {
+            alreadyDrawnNodes = new Dictionary<Type, Node>();
+        }
+
         for (int i = 0; i < types.Length; i++)
         {
             if(!types[i].IsSubclassOf(typeof(TestClass))) {
                 continue;
             }
-
+            parentNode = null;
             DrawNodeRecursive(types[i]);
             /*
             FieldInfo[] depFields = Container.GetDependencyFields(types[i]);
@@ -89,25 +96,40 @@ public class NodeBasedEditor : EditorWindow
     Vector2 startPos = new Vector2(1, 1);
     int counterX = 0;
     int counterY = 0;
-
+    Node parentNode;
+    Dictionary<Type, Node> alreadyDrawnNodes;
 
     private void DrawNodeRecursive(Type type) {
-        Node parentNode = null;
         // Ta en type.
         // Rita låda för type.
-        Node node = new Node(type.Name, startPos /*+ new Vector2(0, 50 * -counterY)*/, 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, OnClickInPoint, OnClickOutPoint);
 
-        nodes.Add(node);
+        Node node;
 
+        if(!alreadyDrawnNodes.TryGetValue(type, out node)) {
+            node = new Node(type.Name, startPos /*+ new Vector2(0, 50 * -counterY)*/, 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle/*, OnClickInPoint, OnClickOutPoint*/);
+            nodes.Add(node);
+            alreadyDrawnNodes.Add(type, node);
+
+
+        }
+        
+        if(parentNode != null) {
+            connections.Add(new Connection(node, parentNode, null));
+        }
+
+        parentNode = node;
+        
         counterY += 1;
 
+        // Ta alla dependencies.
+        // Gör samma sak rekursivt.
         FieldInfo[] depFields = Container.GetDependencyFields(type);
 
         for(int i = 0; i < depFields.Length; i++) {
             DrawNodeRecursive(depFields[i].FieldType);
         }
 
-        // Ta alla dependencies.
+
 
 
 
@@ -197,7 +219,7 @@ public class NodeBasedEditor : EditorWindow
 
         //nodes.Add(new Node(mousePosition, 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, OnClickInPoint, OnClickOutPoint));
     }
-
+    /*
     private void OnClickInPoint(ConnectionPoint inPoint)
     {
         selectedInPoint = inPoint;
@@ -214,8 +236,8 @@ public class NodeBasedEditor : EditorWindow
                 ClearConnectionSelection();
             }
         }
-    }
-
+    }*/
+    /*
     private void OnClickOutPoint(ConnectionPoint outPoint)
     {
         selectedOutPoint = outPoint;
@@ -233,20 +255,20 @@ public class NodeBasedEditor : EditorWindow
             }
         }
     }
-
+    */
     private void OnClickRemoveConnection(Connection connection)
     {
         connections.Remove(connection);
     }
 
-    private void CreateConnection()
+    private void CreateConnection(Node nodeA, Node nodeB)
     {
         if (connections == null)
         {
             connections = new List<Connection>();
         }
 
-        connections.Add(new Connection(selectedInPoint, selectedOutPoint, OnClickRemoveConnection));
+        connections.Add(new Connection(nodeA, nodeB, OnClickRemoveConnection));
     }
 
     private void ClearConnectionSelection()

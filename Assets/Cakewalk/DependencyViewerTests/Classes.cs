@@ -8,7 +8,6 @@ public abstract class TestClass { }
 // Simple dependency tree
 public class A : TestClass {
     [Dependency] B b;
-
 }
 
 public class B : TestClass {
@@ -22,7 +21,7 @@ public class C : TestClass {
 }
 
 public class D : TestClass {
-    [Dependency] F f;
+    [Dependency] E b;
 }
 
 public class E : TestClass {
