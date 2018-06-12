@@ -23,7 +23,7 @@ public class NodeBasedEditor : EditorWindow
     private static void OpenWindow()
     {
         NodeBasedEditor window = GetWindow<NodeBasedEditor>();
-        window.titleContent = new GUIContent("Node Based Editor");
+        window.titleContent = new GUIContent("Dependency graph");
     }
 
     private void OnEnable()
@@ -48,13 +48,13 @@ public class NodeBasedEditor : EditorWindow
         outPointStyle.active.background = EditorGUIUtility.Load("builtin skins/darkskin/images/btn right on.png") as Texture2D;
         outPointStyle.border = new RectOffset(4, 4, 12, 12);
 
-        CreateNodeForAllClasses();
+        CreateNodeForAllClassesDEBUG();
     }
 
-    private void CreateNodeForAllClasses() {
+    private void CreateNodeForAllClassesDEBUG() {
         Type[] types = Assembly.GetAssembly(typeof(BootStrapper)).GetTypes();
 
-        Vector2 startPos = new Vector2(0, 0);
+
 
         if (nodes == null)
         {
@@ -63,16 +63,57 @@ public class NodeBasedEditor : EditorWindow
 
         for (int i = 0; i < types.Length; i++)
         {
-            FieldInfo[] depFields = Container.GetDependencyFields(types[i]);
-            if (depFields.Length > 0)
-            {
-                Debug.Log(types[i].Name);
-                nodes.Add(new Node(types[i].Name, startPos + new Vector2(i *200,0), 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, OnClickInPoint, OnClickOutPoint));
+            if(!types[i].IsSubclassOf(typeof(TestClass))) {
+                continue;
             }
+
+            DrawNodeRecursive(types[i]);
+            /*
+            FieldInfo[] depFields = Container.GetDependencyFields(types[i]);
+
+            List<Type> dependencyChain = new List<Type>();
+
+            if(depFields.Length == 0) {
+                continue;
+            }
+
+            //dependencyChain.Add(depFields[i].FieldType);
+            
+            Debug.Log(types[i].Name);
+            nodes.Add(new Node(types[i].Name, startPos + new Vector2(i *200,0), 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, OnClickInPoint, OnClickOutPoint));
+            */
 
         }
     }
 
+    Vector2 startPos = new Vector2(1, 1);
+    int counterX = 0;
+    int counterY = 0;
+
+
+    private void DrawNodeRecursive(Type type) {
+        Node parentNode = null;
+        // Ta en type.
+        // Rita låda för type.
+        Node node = new Node(type.Name, startPos /*+ new Vector2(0, 50 * -counterY)*/, 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, OnClickInPoint, OnClickOutPoint);
+
+        nodes.Add(node);
+
+        counterY += 1;
+
+        FieldInfo[] depFields = Container.GetDependencyFields(type);
+
+        for(int i = 0; i < depFields.Length; i++) {
+            DrawNodeRecursive(depFields[i].FieldType);
+        }
+
+        // Ta alla dependencies.
+
+
+
+    }
+
+    
     private void OnGUI()
     {
         DrawNodes();
