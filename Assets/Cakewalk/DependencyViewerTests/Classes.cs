@@ -21,7 +21,7 @@ public class C : TestClass {
 }
 
 public class D : TestClass {
-    [Dependency] E b;
+    [Dependency] E e;
 }
 
 public class E : TestClass {
@@ -29,6 +29,6 @@ public class E : TestClass {
 }
 
 public class F : TestClass {
-
+    [Dependency] E e;
 
 }

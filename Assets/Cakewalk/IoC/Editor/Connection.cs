@@ -25,7 +25,7 @@ public class Connection
         
         float size = 16f;
         Vector3[] arrowPoints = new Vector3[] {
-            center + toTarget * size,
+            center - toTarget * size,
             center + perp * size * 0.4f,
             center - perp * size * 0.4f
         }; 
