@@ -26,7 +26,6 @@ public class D : TestClass {
 
 public class E : TestClass {
 
-
 }
 
 public class F : TestClass {

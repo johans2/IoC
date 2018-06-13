@@ -54,8 +54,14 @@ public class NodeBasedEditor : EditorWindow
     private void CreateNodeForAllClassesDEBUG() {
         Type[] types = Assembly.GetAssembly(typeof(BootStrapper)).GetTypes();
 
+        List<Type> testTypes = new List<Type>();
 
-
+        for(int i = 0; i < types.Length; i++) {
+            if(types[i].IsSubclassOf(typeof(TestClass))) {
+                testTypes.Add(types[i]);
+            }
+        }
+        
         if (nodes == null)
         {
             nodes = new List<Node>();
@@ -68,71 +74,83 @@ public class NodeBasedEditor : EditorWindow
             alreadyDrawnNodes = new Dictionary<Type, Node>();
         }
 
-        for (int i = 0; i < types.Length; i++)
+        int row_ = 0;
+
+        for (int i = 0; i < testTypes.Count; i++)
         {
-            if(!types[i].IsSubclassOf(typeof(TestClass))) {
-                continue;
-            }
+            
             parentNode = null;
 
-            DrawNodeRecursive(types[i]);
-            /*
-            FieldInfo[] depFields = Container.GetDependencyFields(types[i]);
+            Debug.Log(testTypes[i].Name);
+            column = 0;
 
-            List<Type> dependencyChain = new List<Type>();
-
-            if(depFields.Length == 0) {
-                continue;
+            if(alreadyDrawnNodes.ContainsKey(testTypes[i])) {
+                row_++;
             }
 
-            //dependencyChain.Add(depFields[i].FieldType);
-            
-            Debug.Log(types[i].Name);
-            nodes.Add(new Node(types[i].Name, startPos + new Vector2(i *200,0), 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, OnClickInPoint, OnClickOutPoint));
-            */
+
+            DrawNodeRecursive(testTypes[i], row_);
 
         }
     }
 
     Vector2 startPos = new Vector2(0, 0);
     int counterX = 0;
-    int counterY = 0;
+    int column = 0;
     Node parentNode;
     Dictionary<Type, Node> alreadyDrawnNodes;
 
-    private void DrawNodeRecursive(Type type) {
+    private void DrawNodeRecursive(Type type, int row) {
         // Ta en type.
         // Rita låda för type.
 
-        if(type.Name == "C") {
+        if(type.Name == "F") {
             int a = 1;
         }
 
-        Node node;
 
+        // Draw the node if it has not already been drawn.
+        Node node;
         if(!alreadyDrawnNodes.TryGetValue(type, out node)) {
-            node = new Node(type.Name, startPos + new Vector2(200f * counterX, 200f * counterY), 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle/*, OnClickInPoint, OnClickOutPoint*/);
+            node = new Node(type.Name, startPos + new Vector2(50f * row, 200f * column), 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle/*, OnClickInPoint, OnClickOutPoint*/);
             nodes.Add(node);
             alreadyDrawnNodes.Add(type, node);
-
-
         }
-        
+
+        // If a parent is set, make a connection to it.
         if(parentNode != null) {
             connections.Add(new Connection(node, parentNode, null));
         }
-        
-        counterY ++;
 
-        // Ta alla dependencies.
-        // Gör samma sak rekursivt.
+        // Go lower
+        column ++;
+
+        // Get all dependencies.
         FieldInfo[] depFields = Container.GetDependencyFields(type);
 
+        // Draw all child nodes
         for(int i = 0; i < depFields.Length; i++) {
             parentNode = node;
-            DrawNodeRecursive(depFields[i].FieldType);
+            Node childNode;
+            if(!alreadyDrawnNodes.TryGetValue(depFields[i].FieldType, out childNode)) {
+                childNode = new Node(depFields[i].FieldType.Name, startPos + new Vector2(200f * i, 200f * column), 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle/*, OnClickInPoint, OnClickOutPoint*/);
+                nodes.Add(childNode);
+                alreadyDrawnNodes.Add(depFields[i].FieldType, childNode);
+
+                // If a parent is set, make a connection to it.
+                if(parentNode != null) {
+                    connections.Add(new Connection(childNode, parentNode, null));
+                }
+            }
+
             
         }
+
+        // Go over all child nodes and do the same thing.
+        for(int i = 0; i < depFields.Length; i++) {
+            DrawNodeRecursive(depFields[i].FieldType, i);
+        }
+
     }
 
     
