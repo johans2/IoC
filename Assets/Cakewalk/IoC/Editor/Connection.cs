@@ -15,17 +15,8 @@ public class Connection
 
     public void Draw()
     {
+        Handles.DrawLine(inPoint.rect.center, outPoint.rect.center);
         
-        Handles.DrawBezier(
-            inPoint.rect.center,
-            outPoint.rect.center,
-            inPoint.rect.center + Vector2.down * 50f,
-            outPoint.rect.center - Vector2.down * 50f,
-            Color.white,
-            null,
-            2f
-        );
-
         Vector3 toTarget = (inPoint.rect.center - outPoint.rect.center).normalized;
 
         Vector3 perp = Vector3.Cross(toTarget, Vector3.forward).normalized;
