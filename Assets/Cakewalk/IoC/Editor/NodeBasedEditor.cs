@@ -81,20 +81,19 @@ public class NodeBasedEditor : EditorWindow
             
             parentNode = null;
 
-            Debug.Log(testTypes[i].Name);
+            //Debug.Log(testTypes[i].Name);
             column = 0;
 
-            if(alreadyDrawnNodes.ContainsKey(testTypes[i])) {
-                row_++;
+            if(!alreadyDrawnNodes.ContainsKey(testTypes[i])) {
+                DrawNodeRecursive(testTypes[i], row_);
             }
 
 
-            DrawNodeRecursive(testTypes[i], row_);
 
         }
     }
 
-    Vector2 startPos = new Vector2(0, 0);
+    Vector2 startPos = new Vector2(1, 1);
     int counterX = 0;
     int column = 0;
     Node parentNode;
@@ -117,9 +116,10 @@ public class NodeBasedEditor : EditorWindow
         // Draw the node if it has not already been drawn.
         Node node;
         if(!alreadyDrawnNodes.TryGetValue(type, out node)) {
-            node = new Node(type.Name, startPos + new Vector2(50f * row, 100f * column), 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle/*, OnClickInPoint, OnClickOutPoint*/);
+            node = new Node(type.Name, startPos + new Vector2(200f * row, 100f * column), 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle/*, OnClickInPoint, OnClickOutPoint*/);
             nodes.Add(node);
             alreadyDrawnNodes.Add(type, node);
+            Debug.Log("Drew node: " + node.title);
         }
 
         // If a parent is set, make a connection to it.
