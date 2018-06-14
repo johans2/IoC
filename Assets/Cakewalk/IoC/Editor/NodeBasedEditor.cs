@@ -112,7 +112,7 @@ public class NodeBasedEditor : EditorWindow
         // Draw the node if it has not already been drawn.
         Node node;
         if(!alreadyDrawnNodes.TryGetValue(type, out node)) {
-            node = new Node(type.Name, startPos + new Vector2(50f * row, 200f * column), 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle/*, OnClickInPoint, OnClickOutPoint*/);
+            node = new Node(type.Name, startPos + new Vector2(50f * row, 100f * column), 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle/*, OnClickInPoint, OnClickOutPoint*/);
             nodes.Add(node);
             alreadyDrawnNodes.Add(type, node);
         }
@@ -128,29 +128,12 @@ public class NodeBasedEditor : EditorWindow
         // Get all dependencies.
         FieldInfo[] depFields = Container.GetDependencyFields(type);
 
-        // Draw all child nodes
-        for(int i = 0; i < depFields.Length; i++) {
-            parentNode = node;
-            Node childNode;
-            if(!alreadyDrawnNodes.TryGetValue(depFields[i].FieldType, out childNode)) {
-                childNode = new Node(depFields[i].FieldType.Name, startPos + new Vector2(200f * i, 200f * column), 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle/*, OnClickInPoint, OnClickOutPoint*/);
-                nodes.Add(childNode);
-                alreadyDrawnNodes.Add(depFields[i].FieldType, childNode);
-
-                // If a parent is set, make a connection to it.
-                if(parentNode != null) {
-                    connections.Add(new Connection(childNode, parentNode, null));
-                }
-            }
-
-            
-        }
-
+        // Recursion 
         // Go over all child nodes and do the same thing.
         for(int i = 0; i < depFields.Length; i++) {
+            parentNode = node;
             DrawNodeRecursive(depFields[i].FieldType, i);
         }
-
     }
 
     
