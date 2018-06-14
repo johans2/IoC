@@ -17,11 +17,11 @@ public class B : TestClass {
 
 public class C : TestClass {
     [Dependency] D d;
-    [Dependency] E e;
 }
 
 public class D : TestClass {
     [Dependency] E e;
+    [Dependency] F f;
 }
 
 public class E : TestClass {

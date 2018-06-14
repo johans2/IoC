@@ -5,6 +5,7 @@ using System.Reflection;
 using Cakewalk.IoC.Core;
 using Cakewalk.IoC;
 using System;
+using System.Linq;
 
 public class NodeBasedEditor : EditorWindow
 {
@@ -49,6 +50,7 @@ public class NodeBasedEditor : EditorWindow
         outPointStyle.border = new RectOffset(4, 4, 12, 12);
 
         CreateNodeForAllClassesDEBUG();
+        LayoutGraph();
     }
 
     private void CreateNodeForAllClassesDEBUG() {
@@ -70,8 +72,8 @@ public class NodeBasedEditor : EditorWindow
         if(connections == null) {
             connections = new List<Connection>();
         }
-        if(alreadyDrawnNodes == null) {
-            alreadyDrawnNodes = new Dictionary<Type, Node>();
+        if(drawnNodes == null) {
+            drawnNodes = new Dictionary<Type, Node>();
         }
 
         int row_ = 0;
@@ -80,24 +82,23 @@ public class NodeBasedEditor : EditorWindow
         {
             
             parentNode = null;
-
-            //Debug.Log(testTypes[i].Name);
             column = 0;
 
-            if(!alreadyDrawnNodes.ContainsKey(testTypes[i])) {
+            if(!drawnNodes.ContainsKey(testTypes[i])) {
                 DrawNodeRecursive(testTypes[i], row_);
             }
-
-
-
         }
     }
+
+
+    
+
 
     Vector2 startPos = new Vector2(1, 1);
     int counterX = 0;
     int column = 0;
     Node parentNode;
-    Dictionary<Type, Node> alreadyDrawnNodes;
+    Dictionary<Type, Node> drawnNodes;
 
     // TODO: DO this.. https://en.wikipedia.org/wiki/Coffman%E2%80%93Graham_algorithm
     // 1. Lägg till incoming out outgoing nodes i node klassen.
@@ -115,10 +116,10 @@ public class NodeBasedEditor : EditorWindow
 
         // Draw the node if it has not already been drawn.
         Node node;
-        if(!alreadyDrawnNodes.TryGetValue(type, out node)) {
+        if(!drawnNodes.TryGetValue(type, out node)) {
             node = new Node(type.Name, startPos + new Vector2(200f * row, 100f * column), 200, 50, nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle/*, OnClickInPoint, OnClickOutPoint*/);
             nodes.Add(node);
-            alreadyDrawnNodes.Add(type, node);
+            drawnNodes.Add(type, node);
             Debug.Log("Drew node: " + node.title);
         }
 
@@ -141,7 +142,101 @@ public class NodeBasedEditor : EditorWindow
         }
     }
 
-    
+    List<Node> nodeOrdering = new List<Node>();
+    private void LayoutGraph() {
+
+        List<Node> allNodes = drawnNodes.Values.ToList();
+        /*
+        1. Construct a topological ordering of G in which the vertices are ordered lexicographically by the set of positions of their incoming neighbors.
+        To do so, add the vertices one at a time to the ordering, 
+        at each step choosing a vertex v to add such that the incoming neighbors of v are all already part of the partial ordering, 
+        and such that the most recently added incoming neighbor of v is earlier than the most recently added incoming neighbor of any other vertex that could be added in place of v.
+        If two vertices have the same most recently added incoming neighbor, the algorithm breaks the tie in favor of the one whose second most recently added incoming neighbor is earlier, etc.
+        */
+        
+
+        // Add all nodes with no connections at all
+        nodeOrdering.AddRange(allNodes.FindAll((n) => n.incomingDeps.Count == 0 && n.outgoingDeps.Count == 0));
+        
+        // Add all nodes with only outgoing connections.
+        nodeOrdering.AddRange(allNodes.FindAll((n) => n.incomingDeps.Count == 0 && n.outgoingDeps.Count > 0 ));
+        
+        // Remove already added nodes list.
+        allNodes.RemoveAll(n => nodeOrdering.Contains(n));
+
+        // Go through all other nodes.
+
+        int debugMaxIter = 200;
+
+        while(allNodes.Count > 0) {
+            
+            List<Node> validNextNodes = allNodes.FindAll((n) => NodeOrderingContainsAllDeps(n));
+
+            // För alla valid nodes n. Hämta incomingdep som ligger höst upp i högen n'. 
+            List<TopOfOrderingNeighbor> topOfOrderingNodes = new List<TopOfOrderingNeighbor>();
+            
+            foreach(var validNextNode in validNextNodes) {
+                
+                int topOfOrderingListDepIndex= 0;
+                // Vilken av mina incomingdeps ligger högst upp i högen?
+                foreach(var dNode in validNextNode.incomingDeps) {
+                    if(nodeOrdering.IndexOf(dNode) >= topOfOrderingListDepIndex) {
+                        topOfOrderingListDepIndex = nodeOrdering.IndexOf(dNode);
+                    }
+                }
+
+                topOfOrderingNodes.Add(new TopOfOrderingNeighbor() { index = topOfOrderingListDepIndex, node = validNextNode });
+            }
+
+            // Den nod n vars n' ligger längst ner i högen. Lägg till denna i högen.
+            // aka ta den     TopOfOrderingNeighbor  som har lägst n.
+            // TODO: This logic does not care about the 2nd degree neighbors if the first one has the same index.
+            Node bestNode = null;
+            int lowestTopIndex = int.MaxValue;
+            foreach(var topOrdNode in topOfOrderingNodes) {
+                if(topOrdNode.index < lowestTopIndex) {
+                    bestNode = topOrdNode.node;
+                }
+            }
+
+            nodeOrdering.Add(bestNode);
+            allNodes.Remove(bestNode);
+
+            debugMaxIter--;
+            if(debugMaxIter < 0) {
+                Debug.LogWarning("Reached max iterations in layout algorithm.");
+                return;
+            }
+
+        }
+
+
+        /*
+        2.Assign the vertices of G to levels in the reverse of the topological ordering constructed in the previous step.For each vertex v,
+        add v to a level that is at least one step higher than the highest level of any outgoing neighbor of v, that does not already have W elements assigned to it,
+        and that is as low as possible subject to these two constraints.
+        */
+        // TODO: Implement this!...
+        foreach(var node in nodeOrdering) {
+            Debug.Log(node.className);
+        }
+
+    }
+
+    struct TopOfOrderingNeighbor {
+        public int index;
+        public Node node;
+    }
+
+    private bool NodeOrderingContainsAllDeps(Node n) {
+        foreach(var node in n.incomingDeps) {
+            if(!nodeOrdering.Contains(node)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void OnGUI()
     {
         DrawConnections();

@@ -45,7 +45,18 @@ public class Node
     }
 
     private void UpdateTitle() {
-        title = className + " in: " + incomingDeps.Count + " out: " + outgoingDeps.Count;
+        string inDepsString = "";
+        string outDepsString = "";
+
+        foreach(var dep in incomingDeps) {
+            inDepsString += dep.className + " ";
+        }
+
+        foreach(var dep in outgoingDeps) {
+            outDepsString += dep.className + " ";
+        }
+
+        title = className + " | in: " + inDepsString + " out: " + outDepsString;
     }
 
     public void Drag(Vector2 delta)
