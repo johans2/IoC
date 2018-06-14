@@ -100,6 +100,11 @@ public class NodeBasedEditor : EditorWindow
     Node parentNode;
     Dictionary<Type, Node> alreadyDrawnNodes;
 
+    // TODO: DO this.. https://en.wikipedia.org/wiki/Coffman%E2%80%93Graham_algorithm
+    // 1. Lägg till incoming out outgoing nodes i node klassen.
+    // 2. Skriv ut detta på boxarna och verifiera att det funkar.
+    // 3. Implementera algoritmen i länken.
+
     private void DrawNodeRecursive(Type type, int row) {
         // Ta en type.
         // Rita låda för type.
@@ -119,7 +124,7 @@ public class NodeBasedEditor : EditorWindow
 
         // If a parent is set, make a connection to it.
         if(parentNode != null) {
-            connections.Add(new Connection(node, parentNode, null));
+            connections.Add(new Connection(parentNode, node, null));
         }
 
         // Go lower

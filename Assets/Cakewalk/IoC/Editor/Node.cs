@@ -1,30 +1,51 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Node
 {
     public Rect rect;
+    public string className;
     public string title = "Derp";
     public bool isDragged;
     public bool isSelected;
-
-    //public ConnectionPoint inPoint;
-    //public ConnectionPoint outPoint;
+    
+    public List<Node> incomingDeps = new List<Node>();
+    public List<Node> outgoingDeps = new List<Node>();
 
     public GUIStyle style;
     public GUIStyle defaultNodeStyle;
     public GUIStyle selectedNodeStyle;
 
-    public Node(string title, Vector2 position, float width, float height, GUIStyle nodeStyle, GUIStyle selectedStyle, GUIStyle inPointStyle, GUIStyle outPointStyle/*, Action<ConnectionPoint> OnClickInPoint, Action<ConnectionPoint> OnClickOutPoint*/)
+    public Node(string className, Vector2 position, float width, float height, GUIStyle nodeStyle, GUIStyle selectedStyle, GUIStyle inPointStyle, GUIStyle outPointStyle/*, Action<ConnectionPoint> OnClickInPoint, Action<ConnectionPoint> OnClickOutPoint*/)
     {
-        this.title = title;
+        this.className = className;
+        title = this.className;
         rect = new Rect(position.x, position.y, width, height);
         style = nodeStyle;
-        //inPoint = new ConnectionPoint(this, ConnectionPointType.In, inPointStyle, OnClickInPoint);
-        //outPoint = new ConnectionPoint(this, ConnectionPointType.Out, outPointStyle, OnClickOutPoint);
         defaultNodeStyle = nodeStyle;
         selectedNodeStyle = selectedStyle;
+    }
+
+    public void AddIncomingDep(Node node) {
+        if(incomingDeps.Contains(node)) {
+            Debug.LogWarning(string.Format("Node {0} already has an incoming dep to {1}", className, node.className));
+        }
+        incomingDeps.Add(node);
+        UpdateTitle();
+    }
+
+    public void AddOutgoingDep(Node node) {
+        if(outgoingDeps.Contains(node)) {
+            Debug.LogWarning(string.Format("Node {0} already has an outgoing dep to {1}", className, node.className));
+        }
+        outgoingDeps.Add(node);
+        UpdateTitle();
+    }
+
+    private void UpdateTitle() {
+        title = className + " in: " + incomingDeps.Count + " out: " + outgoingDeps.Count;
     }
 
     public void Drag(Vector2 delta)
@@ -34,8 +55,6 @@ public class Node
 
     public void Draw()
     {
-        //inPoint.Draw();
-        //outPoint.Draw();
         GUI.Box(rect, title, style);
     }
 
