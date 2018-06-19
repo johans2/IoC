@@ -214,14 +214,17 @@ public class NodeBasedEditor : EditorWindow {
         and that is as low as possible subject to these two constraints.
         */
 
-        List<NodeAndLevel> nodesAndLevels = new List<NodeAndLevel>();
+        Dictionary<int, Level> nodeLevels = new Dictionary<int, Level>();
 
-        // TODO: Implement this!...
+        nodeLevels.Add(0, new Level(0));
+
         foreach(var node in nodeOrdering) {
-            Debug.Log(node.className);
-            nodesAndLevels.Add(new NodeAndLevel() { node = node, level = 0 });
+            Level l0 = nodeLevels[0];
+            l0.nodes.Add(node);
         }
+
         
+        // TODO: Implement this!...
         // Vilken av mina outgoing deps har högst level?
         // Hur många noder ligger i denna level?
 
@@ -232,9 +235,14 @@ public class NodeBasedEditor : EditorWindow {
     }
     
 
-    struct NodeAndLevel{
-        public Node node;
-        public int level;
+    struct Level{
+
+        public List<Node> nodes;
+        public int num;
+        public Level(int num) {
+            nodes = new List<Node>();
+            this.num = num;
+        }
     }
 
     struct TopOfOrderingNeighbor {

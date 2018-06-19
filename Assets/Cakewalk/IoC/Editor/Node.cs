@@ -10,6 +10,7 @@ public class Node
     public string title = "Derp";
     public bool isDragged;
     public bool isSelected;
+    public int graphLevel;
     
     public List<Node> incomingDeps = new List<Node>();
     public List<Node> outgoingDeps = new List<Node>();
