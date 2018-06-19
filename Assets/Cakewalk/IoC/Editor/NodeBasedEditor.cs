@@ -7,8 +7,7 @@ using Cakewalk.IoC;
 using System;
 using System.Linq;
 
-public class NodeBasedEditor : EditorWindow
-{
+public class NodeBasedEditor : EditorWindow {
     private List<Node> nodes;
     private List<Connection> connections;
 
@@ -21,14 +20,12 @@ public class NodeBasedEditor : EditorWindow
     private ConnectionPoint selectedOutPoint;
 
     [MenuItem("Window/Node Based Editor")]
-    private static void OpenWindow()
-    {
+    private static void OpenWindow() {
         NodeBasedEditor window = GetWindow<NodeBasedEditor>();
         window.titleContent = new GUIContent("Dependency graph");
     }
 
-    private void OnEnable()
-    {
+    private void OnEnable() {
         nodeStyle = new GUIStyle();
         nodeStyle.normal.background = EditorGUIUtility.Load("builtin skins/darkskin/images/node1.png") as Texture2D;
         nodeStyle.border = new RectOffset(12, 12, 12, 12);
@@ -63,9 +60,8 @@ public class NodeBasedEditor : EditorWindow
                 testTypes.Add(types[i]);
             }
         }
-        
-        if (nodes == null)
-        {
+
+        if(nodes == null) {
             nodes = new List<Node>();
         }
 
@@ -78,9 +74,8 @@ public class NodeBasedEditor : EditorWindow
 
         int row_ = 0;
 
-        for (int i = 0; i < testTypes.Count; i++)
-        {
-            
+        for(int i = 0; i < testTypes.Count; i++) {
+
             parentNode = null;
             column = 0;
 
@@ -91,7 +86,7 @@ public class NodeBasedEditor : EditorWindow
     }
 
 
-    
+
 
 
     Vector2 startPos = new Vector2(1, 1);
@@ -129,7 +124,7 @@ public class NodeBasedEditor : EditorWindow
         }
 
         // Go lower
-        column ++;
+        column++;
 
         // Get all dependencies.
         FieldInfo[] depFields = Container.GetDependencyFields(type);
@@ -153,14 +148,14 @@ public class NodeBasedEditor : EditorWindow
         and such that the most recently added incoming neighbor of v is earlier than the most recently added incoming neighbor of any other vertex that could be added in place of v.
         If two vertices have the same most recently added incoming neighbor, the algorithm breaks the tie in favor of the one whose second most recently added incoming neighbor is earlier, etc.
         */
-        
+
 
         // Add all nodes with no connections at all
         nodeOrdering.AddRange(allNodes.FindAll((n) => n.incomingDeps.Count == 0 && n.outgoingDeps.Count == 0));
-        
+
         // Add all nodes with only outgoing connections.
-        nodeOrdering.AddRange(allNodes.FindAll((n) => n.incomingDeps.Count == 0 && n.outgoingDeps.Count > 0 ));
-        
+        nodeOrdering.AddRange(allNodes.FindAll((n) => n.incomingDeps.Count == 0 && n.outgoingDeps.Count > 0));
+
         // Remove already added nodes list.
         allNodes.RemoveAll(n => nodeOrdering.Contains(n));
 
@@ -169,15 +164,15 @@ public class NodeBasedEditor : EditorWindow
         int debugMaxIter = 200;
 
         while(allNodes.Count > 0) {
-            
+
             List<Node> validNextNodes = allNodes.FindAll((n) => NodeOrderingContainsAllDeps(n));
 
-            // För alla valid nodes n. Hämta incomingdep som ligger höst upp i högen n'. 
+            // För alla valid nodes n. Hämta incomingdep n' som ligger höst upp i högen . 
             List<TopOfOrderingNeighbor> topOfOrderingNodes = new List<TopOfOrderingNeighbor>();
-            
+
             foreach(var validNextNode in validNextNodes) {
-                
-                int topOfOrderingListDepIndex= 0;
+
+                int topOfOrderingListDepIndex = 0;
                 // Vilken av mina incomingdeps ligger högst upp i högen?
                 foreach(var dNode in validNextNode.incomingDeps) {
                     if(nodeOrdering.IndexOf(dNode) >= topOfOrderingListDepIndex) {
@@ -196,8 +191,10 @@ public class NodeBasedEditor : EditorWindow
             foreach(var topOrdNode in topOfOrderingNodes) {
                 if(topOrdNode.index < lowestTopIndex) {
                     bestNode = topOrdNode.node;
+                    lowestTopIndex = topOrdNode.index;
                 }
             }
+            
 
             nodeOrdering.Add(bestNode);
             allNodes.Remove(bestNode);
@@ -216,11 +213,28 @@ public class NodeBasedEditor : EditorWindow
         add v to a level that is at least one step higher than the highest level of any outgoing neighbor of v, that does not already have W elements assigned to it,
         and that is as low as possible subject to these two constraints.
         */
+
+        List<NodeAndLevel> nodesAndLevels = new List<NodeAndLevel>();
+
         // TODO: Implement this!...
         foreach(var node in nodeOrdering) {
             Debug.Log(node.className);
+            nodesAndLevels.Add(new NodeAndLevel() { node = node, level = 0 });
         }
+        
+        // Vilken av mina outgoing deps har högst level?
+        // Hur många noder ligger i denna level?
 
+        // Behöver ett level koncept. Behöver kunna se hur många nodes som finns i en level.
+        // Behöver att man via en nod man se dennes level.
+
+
+    }
+    
+
+    struct NodeAndLevel{
+        public Node node;
+        public int level;
     }
 
     struct TopOfOrderingNeighbor {
