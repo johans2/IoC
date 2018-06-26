@@ -61,7 +61,7 @@ public class Node
 
         title = className + " | in: " + inDepsString + " out: " + outDepsString;
     }
-
+    
     public void Drag(Vector2 delta)
     {
         rect.position += delta;

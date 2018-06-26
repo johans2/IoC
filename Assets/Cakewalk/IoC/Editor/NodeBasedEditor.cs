@@ -84,11 +84,7 @@ public class NodeBasedEditor : EditorWindow {
             }
         }
     }
-
-
-
-
-
+    
     Vector2 startPos = new Vector2(1, 1);
     int counterX = 0;
     int column = 0;
@@ -238,6 +234,7 @@ public class NodeBasedEditor : EditorWindow {
 
                 if(numNodesOnThisLvl < W) {
                     node.level = levelToPlace;
+                    // TODO: set the order in the level here.
                     foundGoodLevel = true;
                 }
                 else {
@@ -256,6 +253,7 @@ public class NodeBasedEditor : EditorWindow {
         // All nodes should now have levels..
         foreach(var node in nodeOrdering) {
             Debug.Log("Node: " + node.className + "  level: " + node.level);
+           
         }
 
     }
