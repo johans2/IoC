@@ -11,6 +11,7 @@ public class Node
     public bool isDragged;
     public bool isSelected;
     public int graphLevel;
+    public int level;
     
     public List<Node> incomingDeps = new List<Node>();
     public List<Node> outgoingDeps = new List<Node>();
@@ -27,6 +28,7 @@ public class Node
         style = nodeStyle;
         defaultNodeStyle = nodeStyle;
         selectedNodeStyle = selectedStyle;
+        level = -1;
     }
 
     public void AddIncomingDep(Node node) {

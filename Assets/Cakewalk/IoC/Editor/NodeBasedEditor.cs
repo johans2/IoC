@@ -213,27 +213,53 @@ public class NodeBasedEditor : EditorWindow {
         add v to a level that is at least one step higher than the highest level of any outgoing neighbor of v, that does not already have W elements assigned to it,
         and that is as low as possible subject to these two constraints.
         */
-
-        Dictionary<int, Level> nodeLevels = new Dictionary<int, Level>();
-
-        nodeLevels.Add(0, new Level(0));
+        
+        int W = 3;
 
         foreach(var node in nodeOrdering) {
-            Level l0 = nodeLevels[0];
-            l0.nodes.Add(node);
+
+            // Vilken av mina outgoing deps har högst level?
+            int highestNeighborLevel = 0;
+            foreach(var neighborNode in node.outgoingDeps) {
+                if(neighborNode.level > highestNeighborLevel) {
+                    highestNeighborLevel = neighborNode.level;
+                }
+            }
+            
+            bool foundGoodLevel = false;
+            int nextLevel = 0;
+
+            int debugMaxLevelIter = 500;
+
+            while(!foundGoodLevel) {
+                int levelToPlace = highestNeighborLevel + nextLevel;
+
+                int numNodesOnThisLvl = nodeOrdering.FindAll(n => n.level == levelToPlace).Count;
+
+                if(numNodesOnThisLvl < W) {
+                    node.level = levelToPlace;
+                    foundGoodLevel = true;
+                }
+                else {
+                    nextLevel++;    
+                }
+
+                debugMaxLevelIter--;
+                if(debugMaxLevelIter < 0) {
+                    Debug.LogWarning("Reached max iterations in level algorithm.");
+                    return; ;
+                }
+
+            }
         }
 
-        
-        // TODO: Implement this!...
-        // Vilken av mina outgoing deps har högst level?
-        // Hur många noder ligger i denna level?
-
-        // Behöver ett level koncept. Behöver kunna se hur många nodes som finns i en level.
-        // Behöver att man via en nod man se dennes level.
-
+        // All nodes should now have levels..
+        foreach(var node in nodeOrdering) {
+            Debug.Log("Node: " + node.className + "  level: " + node.level);
+        }
 
     }
-    
+
 
     struct Level{
 
