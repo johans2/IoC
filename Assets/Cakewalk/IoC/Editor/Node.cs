@@ -12,6 +12,7 @@ public class Node
     public bool isSelected;
     public int graphLevel;
     public int level;
+    public int orderInLevel;
     
     public List<Node> incomingDeps = new List<Node>();
     public List<Node> outgoingDeps = new List<Node>();
@@ -29,6 +30,7 @@ public class Node
         defaultNodeStyle = nodeStyle;
         selectedNodeStyle = selectedStyle;
         level = -1;
+        orderInLevel = -1;
     }
 
     public void AddIncomingDep(Node node) {

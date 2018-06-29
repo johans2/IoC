@@ -234,7 +234,10 @@ public class NodeBasedEditor : EditorWindow {
 
                 if(numNodesOnThisLvl < W) {
                     node.level = levelToPlace;
-                    // TODO: set the order in the level here.
+                    node.orderInLevel = numNodesOnThisLvl;
+
+                    node.rect.position = new Vector2(node.orderInLevel * 300f, node.level * 200f);
+
                     foundGoodLevel = true;
                 }
                 else {
