@@ -19,6 +19,13 @@ public class NodeBasedEditor : EditorWindow {
     private ConnectionPoint selectedInPoint;
     private ConnectionPoint selectedOutPoint;
 
+
+    private static Type selectedType;
+
+    public static void SetType(Type type) {
+        selectedType = type;
+    }
+
     [MenuItem("Window/Node Based Editor")]
     private static void OpenWindow() {
         NodeBasedEditor window = GetWindow<NodeBasedEditor>();
@@ -46,19 +53,34 @@ public class NodeBasedEditor : EditorWindow {
         outPointStyle.active.background = EditorGUIUtility.Load("builtin skins/darkskin/images/btn right on.png") as Texture2D;
         outPointStyle.border = new RectOffset(4, 4, 12, 12);
 
-        CreateNodeForAllClassesDEBUG();
-        LayoutGraph();
+        //CreateNodeForAllClassesDEBUG();
+        //LayoutGraph();
     }
 
+    private void CreateGraph() {
+        Type type = selectedType;
+        
+        // Count all the bottom nodes. This will be the number of columns 
+
+        // Create a node for the type.
+
+        // Get all [Dependency] fields.
+
+        // 
+
+    }
+    
+
+    #region FullGraphRemove
     private void CreateNodeForAllClassesDEBUG() {
         Type[] types = Assembly.GetAssembly(typeof(BootStrapper)).GetTypes();
 
         List<Type> testTypes = new List<Type>();
 
         for(int i = 0; i < types.Length; i++) {
-            if(types[i].IsSubclassOf(typeof(TestClass))) {
+            //if(types[i].IsSubclassOf(typeof(TestClass))) {
                 testTypes.Add(types[i]);
-            }
+            //}
         }
 
         if(nodes == null) {
@@ -210,7 +232,7 @@ public class NodeBasedEditor : EditorWindow {
         and that is as low as possible subject to these two constraints.
         */
         
-        int W = 3;
+        int W = 6;
 
         foreach(var node in nodeOrdering) {
 
@@ -260,18 +282,7 @@ public class NodeBasedEditor : EditorWindow {
         }
 
     }
-
-
-    struct Level{
-
-        public List<Node> nodes;
-        public int num;
-        public Level(int num) {
-            nodes = new List<Node>();
-            this.num = num;
-        }
-    }
-
+    
     struct TopOfOrderingNeighbor {
         public int index;
         public Node node;
@@ -285,7 +296,8 @@ public class NodeBasedEditor : EditorWindow {
         }
         return true;
     }
-
+    #endregion
+    
     private void OnGUI()
     {
         DrawConnections();
