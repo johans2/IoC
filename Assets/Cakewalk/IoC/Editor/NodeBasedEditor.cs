@@ -55,11 +55,15 @@ public class NodeBasedEditor : EditorWindow {
 
         //CreateNodeForAllClassesDEBUG();
         //LayoutGraph();
+        CreateGraph();
     }
 
+    DependencyTree depTree;
     private void CreateGraph() {
-        Type type = selectedType;
-        
+        depTree = new DependencyTree();
+
+        depTree.rootNode = CreateDependencyNodeRecursive(selectedType);
+
         // Count all the bottom nodes. This will be the number of columns 
 
         // Create a node for the type.
@@ -67,9 +71,36 @@ public class NodeBasedEditor : EditorWindow {
         // Get all [Dependency] fields.
 
         // 
-
+        int a = 1;
     }
-    
+
+    private DependencyNode CreateDependencyNodeRecursive(Type type) {
+        FieldInfo[] depFields = Container.GetDependencyFields(type);
+        
+        DependencyNode depNode = new DependencyNode() { type = type, dependencies = depFields };
+
+        for(int i = 0; i < depNode.dependencies.Length; i++) {
+
+            CreateDependencyNodeRecursive(depNode.dependencies[i].FieldType);
+
+        }
+
+        if(depNode.dependencies.Length == 0) {
+            depTree.numTopNodes++;
+        }
+
+        return depNode;
+    }
+
+    private class DependencyTree {
+        public DependencyNode rootNode;
+        public int numTopNodes;
+    }
+
+    private class DependencyNode {
+        public Type type;
+        public FieldInfo[] dependencies;
+    }
 
     #region FullGraphRemove
     private void CreateNodeForAllClassesDEBUG() {
