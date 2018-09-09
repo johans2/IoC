@@ -4,12 +4,8 @@ using Cakewalk.IoC;
 
 public class ExampleBehaviour : MonoBehaviour {
 
-    [Dependency]
-    private IExampleClass exampleClass { get; set; }
-    
-    
-    [Dependency]
-    private ExampleClass2 exampleClass2 { get; set; }
+    [Dependency] IExampleClass exampleClass;
+    [Dependency] ExampleClass2 exampleClass2;
     
     void Awake() {
         this.Inject();

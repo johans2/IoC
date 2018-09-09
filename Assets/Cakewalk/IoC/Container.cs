@@ -41,19 +41,29 @@ namespace Cakewalk.IoC.Core {
         }
 
         /// <summary>
-        /// Get the properties marked with [Dependency] attribute and inject them.
+        /// Get the fields marked with [Dependency] attribute and inject them.
         /// </summary>
         /// <param name="obj">Object to inject into.</param>
-        public void InjectProperties(object obj) {
+        public void InjectDependencies(object obj)
+        {
             Type type = obj.GetType();
 
-            PropertyInfo[] properties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+            FieldInfo[] dependencyFields = GetDependencyFields(type);
+
+            for (int i = 0; i < dependencyFields.Length; i++)
+            {
+                object instance = Resolve(dependencyFields[i].FieldType);
+                dependencyFields[i].SetValue(obj, instance);
+            }
+        }
+
+
+        private FieldInfo[] GetDependencyFields(Type type)
+        {
+            FieldInfo[] fieldInfo = type.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
                 .Where(prop => prop.IsDefined(typeof(Dependency), false)).ToArray();
 
-            foreach(PropertyInfo property in properties) {
-                object instance = Resolve(property.PropertyType);
-                property.SetValue(obj, instance, null);
-            }
+            return fieldInfo;
         }
 
         /// <summary>
