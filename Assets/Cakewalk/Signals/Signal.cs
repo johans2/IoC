@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using UnityEngine;
 
 namespace Cakewalk.Signal {
 
@@ -14,12 +15,10 @@ namespace Cakewalk.Signal {
         /// Add a unique listener to the signal.
         /// </summary>
         public void AddListener(SignalDelegate listener) {
-            if(SendSignal == null) {
-                SendSignal += listener;
+            if(SendSignal != null && SendSignal.GetInvocationList().Contains(listener)) {
+                Debug.LogWarning(string.Format("Signal already has registered the listener {0}", listener.Method.Name));
             }
-            else if(!SendSignal.GetInvocationList().Contains(listener)) {
-                SendSignal += listener;
-            }
+            SendSignal += listener;
         }
 
         public void RemoveListener(SignalDelegate listener) {
@@ -45,12 +44,10 @@ namespace Cakewalk.Signal {
         /// Add a unique listener to the signal.
         /// </summary>
         public void AddListener(SignalDelegate listener) {
-            if(SendSignal == null) {
-                SendSignal += listener;
+            if (SendSignal != null && SendSignal.GetInvocationList().Contains(listener)) {
+                Debug.LogWarning(string.Format("Signal already has registered the listener {0}", listener.Method.Name));
             }
-            else if(!SendSignal.GetInvocationList().Contains(listener)) {
-                SendSignal += listener;
-            }
+            SendSignal += listener;
         }
 
         public void RemoveListener(SignalDelegate listener) {
@@ -76,12 +73,10 @@ namespace Cakewalk.Signal {
         /// Add a unique listener to the signal.
         /// </summary>
         public void AddListener(SignalDelegate listener) {
-            if(SendSignal == null) {
-                SendSignal += listener;
+            if (SendSignal != null && SendSignal.GetInvocationList().Contains(listener)) {
+                Debug.LogWarning(string.Format("Signal already has registered the listener {0}", listener.Method.Name));
             }
-            else if(!SendSignal.GetInvocationList().Contains(listener)) {
-                SendSignal += listener;
-            }
+            SendSignal += listener;
         }
 
         public void RemoveListener(SignalDelegate listener) {
@@ -107,12 +102,10 @@ namespace Cakewalk.Signal {
         /// Add a unique listener to the signal.
         /// </summary>
         public void AddListener(SignalDelegate listener) {
-            if(SendSignal == null) {
-                SendSignal += listener;
+            if (SendSignal != null && SendSignal.GetInvocationList().Contains(listener)) {
+                Debug.LogWarning(string.Format("Signal already has registered the listener {0}", listener.Method.Name));
             }
-            else if(!SendSignal.GetInvocationList().Contains(listener)) {
-                SendSignal += listener;
-            }
+            SendSignal += listener;
         }
 
         public void RemoveListener(SignalDelegate listener) {
@@ -138,12 +131,10 @@ namespace Cakewalk.Signal {
         /// Add a unique listener to the signal.
         /// </summary>
         public void AddListener(SignalDelegate listener) {
-            if(SendSignal == null) {
-                SendSignal += listener;
+            if (SendSignal != null && SendSignal.GetInvocationList().Contains(listener)) {
+                Debug.LogWarning(string.Format("Signal already has registered the listener {0}", listener.Method.Name));
             }
-            else if(!SendSignal.GetInvocationList().Contains(listener)) {
-                SendSignal += listener;
-            }
+            SendSignal += listener;
         }
 
         public void RemoveListener(SignalDelegate listener) {
