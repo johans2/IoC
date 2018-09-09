@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
-using CakewalkIoC.Injection;
+using Cakewalk.IoC;
 
 public class ExampleBehaviour : MonoBehaviour {
 

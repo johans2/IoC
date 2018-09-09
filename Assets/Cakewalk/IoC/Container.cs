@@ -2,10 +2,9 @@
 using System.Reflection;
 using System.Linq;
 using System;
-using CakewalkIoC.Exceptions;
-using CakewalkIoC.Injection;
+using Cakewalk.Exceptions;
 
-namespace CakewalkIoC.Core {
+namespace Cakewalk.IoC.Core {
 
     public class Container {
 

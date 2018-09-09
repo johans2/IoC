@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using CakewalkIoC.Signal;
+using Cakewalk.Signal;
 using System.Collections;
 
 public class SignalSender : MonoBehaviour {

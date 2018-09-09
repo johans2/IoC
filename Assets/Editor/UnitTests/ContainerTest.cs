@@ -1,10 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
-using NUnit.Framework;
-using System.Reflection;
-using System;
-using CakewalkIoC.Core;
-using CakewalkIoC.Exceptions;
+﻿using NUnit.Framework;
+using Cakewalk.IoC.Core;
+using Cakewalk.Exceptions;
 
 [TestFixture]
 internal class ContainerTest {

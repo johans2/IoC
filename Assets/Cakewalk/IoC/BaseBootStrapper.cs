@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using CakewalkIoC.Injection;
 
-namespace CakewalkIoC.Core {
+namespace Cakewalk.IoC.Core {
 
     public abstract class BaseBootStrapper : MonoBehaviour {
 
