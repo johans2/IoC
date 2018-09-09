@@ -7,7 +7,7 @@ namespace Cakewalk.IoC {
 
         public static Container Container { get; set; }
 
-        public static void Inject<T>(this T monoBehaviour) where T : MonoBehaviour {
+        public static void InjectDependencies<T>(this T monoBehaviour) where T : MonoBehaviour {
             Container.InjectDependencies(monoBehaviour);
         }
     } 

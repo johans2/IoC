@@ -8,7 +8,7 @@ public class ExampleBehaviour : MonoBehaviour {
     [Dependency] ExampleClass2 exampleClass2;
     
     void Awake() {
-        this.Inject();
+        this.InjectDependencies();
     }
 
     void Start() {
